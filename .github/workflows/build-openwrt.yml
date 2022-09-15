@@ -179,4 +179,4 @@ jobs:
         
     - name: pushplus notification     #pushplus推送
       if: steps.organize.outputs.status == 'success' && !cancelled()
-      run: curl "http://www.pushplus.plus/send?token=${{secrets.pushplus_token}}&title=git发布成功-编译结束&content=${{ env.useVersionInfo }}"  
+      run: curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=git发布成功-编译结束&content=${{ env.useVersionInfo }}"  
