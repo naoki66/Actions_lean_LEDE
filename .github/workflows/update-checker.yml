@@ -56,3 +56,7 @@ jobs:
       with:
         retain_days: 1
         keep_minimum_runs: 1
+     
+    - name: pushplus notification     #pushplus推送
+      if: steps.cacheHash.outputs.cache-hit != 'true' && !cancelled()
+      run: curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=lean源码有更新！"  
