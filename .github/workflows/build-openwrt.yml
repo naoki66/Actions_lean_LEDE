@@ -152,6 +152,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ steps.tag.outputs.release_tag }}
+        body: |
+               (git show -s --date=short --format="编译前的主源码更新记录:<br/>更新人: %an<br/>更新时间: %cd<br/>更新内容: %s<br/>哈希值: %H")
         body_path: release.txt
         files: ${{ env.FIRMWARE }}/*
 
