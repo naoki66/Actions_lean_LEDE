@@ -72,7 +72,12 @@ jobs:
       run: cd openwrt && ./scripts/feeds update -a
 
     - name: Install feeds   #安装feeds、更新代码日期
-      run: cd openwrt && ./scripts/feeds install -a
+      run: |
+       cd openwrt && ./scripts/feeds install -a
+       useVersionInfo=$(git show -s --date=short --format="编译前的最后一次[➦主源码](https://github.com/coolsnowwolf/lede)更新记录:<br/>更新人: %an<br/>更新时间: %cd<br/>更新内容: %s<br/>哈希值: %H")
+       echo "useVersionInfo=$useVersionInfo" >> $GITHUB_ENV
+       echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
+       echo "DATE1=$(date "+%Y.%m.%d")" >> $GITHUB_ENV
 
     - name: Load custom configuration  #载入配置文件、标记日期
       run: |
@@ -153,8 +158,8 @@ jobs:
       with:
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body: |
-               (git show -s --date=short --format="编译前的主源码更新记录:<br/>更新人: %an<br/>更新时间: %cd<br/>更新内容: %s<br/>哈希值: %H")
-        body_path: release.txt
+          ${{ env.useVersionInfo }}
+        # body_path: release.txt
         files: ${{ env.FIRMWARE }}/*
 
     - name: Delete workflow runs     #删除workflow
