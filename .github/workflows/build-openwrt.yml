@@ -178,5 +178,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
     - name: pushplus notification     #pushplus推送
-      if: steps.organize.outputs.status == 'success' && !cancelled()
-      run: curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=git发布成功-编译结束&content=${{ env.useVersionInfo }}"  
+      if: steps.tag.outputs.status == 'success' && !cancelled()
+      run: curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=X64发布成功&content=${{env.useVersionInfo }}"  
