@@ -88,13 +88,6 @@ jobs:
         $GITHUB_WORKSPACE/$DIY_P2_SH
         sed -i 's/OpenWrt/OpenwrtBuild ${{ env.DATE1 }} @ OpenWrt/g' package/lean/default-settings/files/zzz-default-settings
 
-    - name: SSH connection to Actions  #SSH运行
-      uses: P3TERX/ssh2actions@v1.0.0
-      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
-      env:
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-
     - name: Download package #下载包
       id: package
       run: |
