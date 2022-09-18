@@ -13,11 +13,7 @@ name: Update_Checker
 
 env:
 
-  # NEW_LEDE_Actions源码
-  REPO_URL_NEW_LEDE_Actions: https://github.com/naoki66/NEW_LEDE_Actions.git
-  REPO_BRANCH_NEW_LEDE_Actions: main
-  REPO_PATH_NEW_LEDE_Actions : "NEW_LEDE_Actions"
-
+  
   # Lean源码
   REPO_URL_Lede: https://github.com/coolsnowwolf/lede
   REPO_BRANCH_Lede: master
@@ -65,10 +61,6 @@ jobs:
     - name: Get Commit Hash
       id: getHash
       run: |
-        git clone --depth 1 $REPO_URL_NEW_LEDE_Actions -b $REPO_BRANCH_NEW_LEDE_Actions $REPO_PATH_NEW_LEDE_Actions
-        cd $REPO_PATH_NEW_LEDE_Actions
-        echo "::set-output name=commitHash_NEW_LEDE_Actions::$(git rev-parse HEAD)"
-        cd
         git clone --depth 1 $REPO_URL_Lede -b $REPO_BRANCH_Lede $REPO_PATH_Lede
         cd $REPO_PATH_Lede
         echo "::set-output name=commitHash_Lede::$(git rev-parse HEAD)"
@@ -98,7 +90,6 @@ jobs:
     - name: Show Commit Head and Combination Heads
       id: combHeader
       run: |
-        echo "commitHash_NEW_LEDE_Actions: ${{ steps.getHash.outputs.commitHash_NEW_LEDE_Actions }}"
         echo "commitHash_Lede: ${{ steps.getHash.outputs.commitHash_Lede }}"
         echo "commitHash_Lede_Package: ${{ steps.getHash.outputs.commitHash_Lede_Package }}"
         echo "commitHash_Lede_Luci: ${{ steps.getHash.outputs.commitHash_Lede_Luci }}"
@@ -106,7 +97,6 @@ jobs:
         echo "commitHash_OPENWRT_TELEPHONY: ${{ steps.getHash.outputs.commitHash_OPENWRT_TELEPHONY }}"
         echo "commitHash_HelloWorld: ${{ steps.getHash.outputs.commitHash_HelloWorld }}"
         echo "::set-output name=commitHash_All::\
-          ${{steps.getHash.outputs.commitHash_NEW_LEDE_Actions}}\
           ${{steps.getHash.outputs.commitHash_Lede}}\
           ${{steps.getHash.outputs.commitHash_Lede_Package}}\
           ${{steps.getHash.outputs.commitHash_Lede_Luci}}\
@@ -125,7 +115,6 @@ jobs:
     - name: Save New Commit Hash
       if: steps.cacheHash.outputs.cache-hit != 'true'
       run: |
-        echo ${{ steps.getHash.outputs.commitHash_NEW_LEDE_Actions }} | tee .commitHash_NEW_LEDE_Actions
         echo ${{ steps.getHash.outputs.commitHash_Lede }} | tee .commitHash_Lede
         echo ${{ steps.getHash.outputs.commitHash_Lede_Package }} | tee .commitHash_Lede_Package
         echo ${{ steps.getHash.outputs.commitHash_Lede_Luci }} | tee .commitHash_Lede_Luci
