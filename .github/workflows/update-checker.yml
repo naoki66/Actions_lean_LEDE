@@ -48,22 +48,6 @@ env:
   REPO_BRANCH_HelloWorld: master
   REPO_PATH_HelloWorld : "helloworld"
 
-  # Passwall packages源码
-  #REPO_URL_PassWall_Packages: https://github.com/xiaorouji/openwrt-passwall
-  #REPO_BRANCH_PassWall_Packages: packages
-  #REPO_PATH_PassWall_Packages : "openwrt-passwall_packages"
-
-  # Passwall luci源码
-  #REPO_URL_PassWall_Luci: https://github.com/xiaorouji/openwrt-passwall
-  #REPO_BRANCH_PassWall_Luci: luci
-  #REPO_PATH_PassWall_Luci : "openwrt-passwall_luci"
-
-  # Passwall2源码
-  #REPO_URL_PassWall2: https://github.com/xiaorouji/openwrt-passwall2.git
-  #REPO_BRANCH_PassWall2: main
-  #REPO_PATH_PassWall2 : "openwrt-passwall2"
-
-
 
 on:
   repository_dispatch:
@@ -109,18 +93,7 @@ jobs:
         cd $REPO_PATH_HelloWorld
         echo "::set-output name=commitHash_HelloWorld::$(git rev-parse HEAD)"
         cd
-        git clone --depth 1 $REPO_URL_PassWall_Packages -b $REPO_BRANCH_PassWall_Packages $REPO_PATH_PassWall_Packages
-        cd $REPO_PATH_PassWall_Packages
-        echo "::set-output name=commitHash_PassWall_Package::$(git rev-parse HEAD)"
-        cd
-        git clone --depth 1 $REPO_URL_PassWall_Luci -b $REPO_BRANCH_PassWall_Luci $REPO_PATH_PassWall_Luci
-        cd $REPO_PATH_PassWall_Luci
-        echo "::set-output name=commitHash_PassWall_Luci::$(git rev-parse HEAD)"
-        cd
-        git clone --depth 1 $REPO_URL_PassWall2 -b $REPO_BRANCH_PassWall2 $REPO_PATH_PassWall2
-        cd $REPO_PATH_PassWall2
-        echo "::set-output name=commitHash_PassWall2::$(git rev-parse HEAD)"
-        cd
+
  
     - name: Show Commit Head and Combination Heads
       id: combHeader
@@ -142,10 +115,7 @@ jobs:
           ${{steps.getHash.outputs.commitHash_Lede_Luci}}\
           ${{steps.getHash.outputs.commitHash_OPENWRT_ROUTING}}\
           ${{steps.getHash.outputs.commitHash_OPENWRT_TELEPHONY}}\
-          ${{steps.getHash.outputs.commitHash_HelloWorld}}\
-          ${{steps.getHash.outputs.commitHash_PassWall_Package}}\
-          ${{steps.getHash.outputs.commitHash_PassWall_Luci}}\
-          ${{steps.getHash.outputs.commitHash_PassWall2}}
+          ${{steps.getHash.outputs.commitHash_HelloWorld}}
           
     - name: Compare Commit Hash
       id: cacheHash
@@ -165,9 +135,6 @@ jobs:
         echo ${{ steps.getHash.outputs.commitHash_OPENWRT_ROUTING }} | tee .commitHash_OPENWRT_ROUTING
         echo ${{ steps.getHash.outputs.commitHash_OPENWRT_TELEPHONY }} | tee .commitHash_OPENWRT_TELEPHONY
         echo ${{ steps.getHash.outputs.commitHash_HelloWorld }} | tee .commitHash_HelloWorld
-        #echo ${{ steps.getHash.outputs.commitHash_PassWall_Package }} | tee .commitHash_PassWall_Package
-        #echo ${{ steps.getHash.outputs.commitHash_PassWall_Luci }} | tee .commitHash_PassWall_Luci
-        #echo ${{ steps.getHash.outputs.commitHash_PassWall2 }} | tee .commitHash_PassWall2
         echo ${{ steps.combHeader.outputs.commitHash_All }} | tee .commitHash_All
         echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
