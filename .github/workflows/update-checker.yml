@@ -12,7 +12,6 @@
 name: Update_Checker
 
 env:
-
   
   # Lean源码
   REPO_URL_Lede: https://github.com/coolsnowwolf/lede
@@ -46,7 +45,6 @@ env:
 
 
 on:
-  repository_dispatch:
   workflow_dispatch:
   schedule:
     - cron: 0 */6 * * *
