@@ -89,7 +89,7 @@ jobs:
           ${{steps.getHash.outputs.commitHash_Lede}}\
           ${{steps.getHash.outputs.commitHash_Lede_Package}}\
           ${{steps.getHash.outputs.commitHash_Lede_Luci}}\
-          ${{steps.getHash.outputs.commitHash_HelloWorld}}
+          ${{steps.getHash.outputs.commitHash_HelloWorld}}\
           
     - name: Compare Commit Hash
       id: cacheHash
