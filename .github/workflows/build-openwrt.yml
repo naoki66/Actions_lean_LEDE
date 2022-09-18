@@ -75,8 +75,6 @@ jobs:
     - name: Install feeds   #安装feeds、更新代码日期
       run: |
        cd openwrt && ./scripts/feeds install -a
-       useVersionInfo=$(git show -s --date=short --format="编译前的最后一次[➦主源码](https://github.com/coolsnowwolf/lede)更新记录:<br/>更新人: %an<br/>更新时间: %cd<br/>更新内容: %s<br/>哈希值: %H")
-       echo "useVersionInfo=$useVersionInfo" >> $GITHUB_ENV
        echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
        echo "DATE1=$(date "+%Y.%m.%d")" >> $GITHUB_ENV
 
@@ -107,19 +105,8 @@ jobs:
         echo "::set-output name=status::success"
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
-        echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+        echo "FILE_DATE= $(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
-   
-    - name: Remove Unuselesss Files To Free Up Space #清理空间
-      id: removeunuselessfiles
-      run: |
-        df -hT
-        rm -rf  $GITHUB_WORKSPACE/openwrt/build_dir
-        rm -rf  $GITHUB_WORKSPACE/openwrt/dl
-        rm -rf  $GITHUB_WORKSPACE/openwrt/staging_dir
-        rm -rf  $GITHUB_WORKSPACE/openwrt/target
-        rm -rf  $GITHUB_WORKSPACE/openwrt/toolchain
-        rm -rf  $GITHUB_WORKSPACE/openwrt/tools
 
     - name: Check space usage  #检查空间
       if: (!cancelled())
@@ -150,10 +137,9 @@ jobs:
 
     - name: Generate release tag  #创建release tag
       id: tag
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
         echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
-        echo "${{ env.useVersionInfo }}" >> release.txt
         echo "## Update content" >> release.txt
         echo "<details> <summary> Lean Openwrt Commit Top $COMMIT_LOG_NUM </summary>" >> release.txt
         git -C openwrt log -n $COMMIT_LOG_NUM >> release.txt
@@ -197,4 +183,4 @@ jobs:
       if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
         echo "env.MSN=release.txt" >> $GITHUB_ENV   
-        curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=X64发布成功&content=${{env.MSN}}"  
+        curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=X64发布成功&content=${{env.FILE_DATE}}"  
