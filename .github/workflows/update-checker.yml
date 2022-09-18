@@ -11,14 +11,48 @@
 
 name: Update Checker
 
-env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
-  REPO_BRANCH: master
+
+  # NEW_LEDE_Actions源码
+  REPO_URL_smallprogramAction: https://github.com/naoki66/NEW_LEDE_Actions.git
+  REPO_BRANCH_smallprogramAction: main
+  REPO_PATH_smallprogramAction : "NEW_LEDE_Actions"
+
+  # Lean源码
+  REPO_URL_Lede: https://github.com/coolsnowwolf/lede
+  REPO_BRANCH_Lede: master
+  REPO_PATH_Lede : "lede"
+
+  # Lean Package源码
+  REPO_URL_Lede_Package: https://github.com/coolsnowwolf/packages
+  REPO_BRANCH_Lede_Package: master
+  REPO_PATH_Lede_Package : "ledepackage"
+
+  # Lean luci源码
+  REPO_URL_Lede_Luci: https://github.com/coolsnowwolf/luci
+  REPO_BRANCH_Lede_Luci: master
+  REPO_PATH_Lede_Luci : "luci"
+
+  # Openwrt routing源码
+  REPO_URL_OPENWRT_ROUTING: https://git.openwrt.org/feed/routing.git
+  REPO_BRANCH_OPENWRT_ROUTING: master
+  REPO_PATH_OPENWRT_ROUTING : "routing"
+
+  # Openwrt telephony源码
+  REPO_URL_OPENWRT_TELEPHONY: https://git.openwrt.org/feed/telephony.git
+  REPO_BRANCH_OPENWRT_TELEPHONY: master
+  REPO_PATH_OPENWRT_TELEPHONY : "telephony"
+  
+   # helloworld源码
+  REPO_URL_HelloWorld: https://github.com/fw876/helloworld
+  REPO_BRANCH_HelloWorld: master
+  REPO_PATH_HelloWorld : "helloworld"
+
+
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: 0 1/8 * * *
+    - cron: 0 */6 * * *
 
 jobs:
   check:
@@ -26,12 +60,67 @@ jobs:
 
     steps:
 
-    - name: Get Commit Hash
+       - name: Get Commit Hash
       id: getHash
       run: |
-        git clone --depth 1 $REPO_URL -b $REPO_BRANCH .
-        echo "::set-output name=commitHash::$(git rev-parse HEAD)"
+        git clone --depth 1 $REPO_URL_NEW_LEDE_Actions -b $REPO_BRANCH_NEW_LEDE_Actions $REPO_PATH_NEW_LEDE_Actions
+        cd $REPO_PATH_NEW_LEDE_Actions
+        echo "::set-output name=commitHash_smallprogramAction::$(git rev-parse HEAD)"
+        cd
+        git clone --depth 1 $REPO_URL_Lede -b $REPO_BRANCH_Lede $REPO_PATH_Lede
+        cd $REPO_PATH_Lede
+        echo "::set-output name=commitHash_Lede::$(git rev-parse HEAD)"
+        cd
+        git clone --depth 1 $REPO_URL_Lede_Package -b $REPO_BRANCH_Lede_Package $REPO_PATH_Lede_Package
+        cd $REPO_PATH_Lede_Package
+        echo "::set-output name=commitHash_Lede_Package::$(git rev-parse HEAD)"
+        cd
+        git clone --depth 1 $REPO_URL_Lede_Luci -b $REPO_BRANCH_Lede_Luci $REPO_PATH_Lede_Luci
+        cd $REPO_PATH_Lede_Luci
+        echo "::set-output name=commitHash_Lede_Luci::$(git rev-parse HEAD)"
+        cd
+        git clone --depth 1 $REPO_URL_OPENWRT_ROUTING -b $REPO_BRANCH_OPENWRT_ROUTING $REPO_PATH_OPENWRT_ROUTING
+        cd $REPO_PATH_OPENWRT_ROUTING
+        echo "::set-output name=commitHash_OPENWRT_ROUTING::$(git rev-parse HEAD)"
+        cd
+        
+        git clone --depth 1 $REPO_URL_OPENWRT_TELEPHONY -b $REPO_BRANCH_OPENWRT_TELEPHONY $REPO_PATH_OPENWRT_TELEPHONY
+        cd $REPO_PATH_OPENWRT_TELEPHONY
+        echo "::set-output name=commitHash_OPENWRT_TELEPHONY::$(git rev-parse HEAD)"
+        cd
+        git clone --depth 1 $REPO_URL_HelloWorld -b $REPO_BRANCH_HelloWorld $REPO_PATH_HelloWorld 
+        cd $REPO_PATH_HelloWorld
+        echo "::set-output name=commitHash_HelloWorld::$(git rev-parse HEAD)"
+        cd
 
+        
+   #- name: Get Commit Hash
+   #   id: getHash
+   #   run: |
+   #     git clone --depth 1 $REPO_URL -b $REPO_BRANCH .
+   #     echo "::set-output name=commitHash::$(git rev-parse HEAD)"
+
+
+
+    - name: Show Commit Head and Combination Heads
+      id: combHeader
+      run: |
+        echo "commitHash_NEW_LEDE_Actions: ${{ steps.getHash.outputs.commitHash_NEW_LEDE_Actions }}"
+        echo "commitHash_Lede: ${{ steps.getHash.outputs.commitHash_Lede }}"
+        echo "commitHash_Lede_Package: ${{ steps.getHash.outputs.commitHash_Lede_Package }}"
+        echo "commitHash_Lede_Luci: ${{ steps.getHash.outputs.commitHash_Lede_Luci }}"
+        echo "commitHash_OPENWRT_ROUTING: ${{ steps.getHash.outputs.commitHash_OPENWRT_ROUTING }}"
+        echo "commitHash_OPENWRT_TELEPHONY: ${{ steps.getHash.outputs.commitHash_OPENWRT_TELEPHONY }}"
+        echo "commitHash_HelloWorld: ${{ steps.getHash.outputs.commitHash_HelloWorld }}"
+        echo "::set-output name=commitHash_All::\
+          ${{steps.getHash.outputs.commitHash_NEW_LEDE_Actions}}\
+          ${{steps.getHash.outputs.commitHash_Lede}}\
+          ${{steps.getHash.outputs.commitHash_Lede_Package}}\
+          ${{steps.getHash.outputs.commitHash_Lede_Luci}}\
+          ${{steps.getHash.outputs.commitHash_OPENWRT_ROUTING}}\
+          ${{steps.getHash.outputs.commitHash_OPENWRT_TELEPHONY}}\
+          ${{steps.getHash.outputs.commitHash_HelloWorld}}
+          
     - name: Compare Commit Hash
       id: cacheHash
       uses: actions/cache@v2
@@ -42,6 +131,14 @@ jobs:
     - name: Save New Commit Hash
       if: steps.cacheHash.outputs.cache-hit != 'true'
       run: |
+        echo ${{ steps.getHash.outputs.commitHash_NEW_LEDE_Actions }} | tee .commitHash_NEW_LEDE_Actions
+        echo ${{ steps.getHash.outputs.commitHash_Lede }} | tee .commitHash_Lede
+        echo ${{ steps.getHash.outputs.commitHash_Lede_Package }} | tee .commitHash_Lede_Package
+        echo ${{ steps.getHash.outputs.commitHash_Lede_Luci }} | tee .commitHash_Lede_Luci
+        echo ${{ steps.getHash.outputs.commitHash_OPENWRT_ROUTING }} | tee .commitHash_OPENWRT_ROUTING
+        echo ${{ steps.getHash.outputs.commitHash_OPENWRT_TELEPHONY }} | tee .commitHash_OPENWRT_TELEPHONY
+        echo ${{ steps.getHash.outputs.commitHash_HelloWorld }} | tee .commitHash_HelloWorld
+        echo ${{ steps.combHeader.outputs.commitHash_All }} | tee .commitHash_All
         echo ${{ steps.getHash.outputs.commitHash }} | tee .commitHash
         echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
@@ -56,7 +153,7 @@ jobs:
       uses: GitRML/delete-workflow-runs@main
       with:
         retain_days: 1
-        keep_minimum_runs: 1
+        keep_minimum_runs: 2
      
     - name: pushplus notification     #pushplus推送
       if: steps.cacheHash.outputs.cache-hit != 'true' && !cancelled()
