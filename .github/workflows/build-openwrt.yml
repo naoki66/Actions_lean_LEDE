@@ -47,8 +47,8 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-2004)
-        # # sudo -E apt-get -qq install $(curl -fsSL https://raw.githubusercontent.com/naoki66/NEW_LEDE_Actions/master/depends-ubuntu )
+        #sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-2004)
+        sudo -E apt-get -qq install $(curl -fsSL https://raw.githubusercontent.com/naoki66/NEW_LEDE_Actions/master/depends-ubuntu )
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
@@ -143,17 +143,17 @@ jobs:
         
         echo "## Update content" >> release.txt
         
-        echo "<details> <summary> Lean Openwrt Commit Top $COMMIT_LOG_NUM </summary>" >> release.txt
-        git -C openwrt log -n $COMMIT_LOG_NUM >> release.txt
+        echo " Lean Openwrt Commit log  " >> release.txt
+        git -C openwrt log   >> release.txt
         
-        echo "</details> <details> <summary> Lean Package Commit Top $COMMIT_LOG_NUM </summary>" >> release.txt
-        git -C openwrt/feeds/packages log -n $COMMIT_LOG_NUM >> release.txt
+        echo " Lean Package Commit log " >> release.txt
+        git -C openwrt/feeds/packages log   >> release.txt
         
-        echo "</details> <details> <summary> Lean Luci Commit Top $COMMIT_LOG_NUM </summary>" >> release.txt
-        git -C openwrt/feeds/luci log -n $COMMIT_LOG_NUM >> release.txt
+        echo " Lean Luci Commit log " >> release.txt
+        git -C openwrt/feeds/luci log   >> release.txt
         
-        echo "</details> <details> <summary> SSRP Commit Top $COMMIT_LOG_NUM </summary>" >> release.txt
-        git -C openwrt/feeds/helloworld log -n $COMMIT_LOG_NUM >> release.txt
+        echo "  SSRP Commit log " >> release.txt
+        git -C openwrt/feeds/helloworld log >> release.txt
 
         touch release.txt
         echo "::set-output name=status::success"
