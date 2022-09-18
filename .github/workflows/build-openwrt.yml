@@ -183,4 +183,4 @@ jobs:
       if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
         echo "env.MSN=release.txt" >> $GITHUB_ENV   
-        curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=X64发布成功&content=${{env.FILE_DATE}}"  
+        curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=X64发布成功&content=${{env.DATE}}"  
