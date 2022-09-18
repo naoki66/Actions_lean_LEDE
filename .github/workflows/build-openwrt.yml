@@ -139,16 +139,22 @@ jobs:
       id: tag
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
+        echo "::set-output name=release_tag::$RELEASE_TAG-$(date +"%Y.%m.%d-%H%M")"
+        
         echo "## Update content" >> release.txt
+        
         echo "<details> <summary> Lean Openwrt Commit Top $COMMIT_LOG_NUM </summary>" >> release.txt
         git -C openwrt log -n $COMMIT_LOG_NUM >> release.txt
+        
         echo "</details> <details> <summary> Lean Package Commit Top $COMMIT_LOG_NUM </summary>" >> release.txt
         git -C openwrt/feeds/packages log -n $COMMIT_LOG_NUM >> release.txt
+        
         echo "</details> <details> <summary> Lean Luci Commit Top $COMMIT_LOG_NUM </summary>" >> release.txt
         git -C openwrt/feeds/luci log -n $COMMIT_LOG_NUM >> release.txt
+        
         echo "</details> <details> <summary> SSRP Commit Top $COMMIT_LOG_NUM </summary>" >> release.txt
         git -C openwrt/feeds/helloworld log -n $COMMIT_LOG_NUM >> release.txt
+
         touch release.txt
         echo "::set-output name=status::success"
 
