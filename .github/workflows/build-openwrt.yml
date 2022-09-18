@@ -170,7 +170,6 @@ jobs:
     - name: Upload firmware to release  #上传release
       uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled()
-      run:  echo "env.MSN=release.txt" >> $GITHUB_ENV   
       env:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}
       with:
@@ -197,4 +196,6 @@ jobs:
         
     - name: pushplus notification     #pushplus推送
       if: steps.tag.outputs.status == 'success' && !cancelled()
-      run: curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=X64发布成功&content=${{env.MSN}}"  
+      run: |
+        echo "env.MSN=release.txt" >> $GITHUB_ENV   
+        curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=X64发布成功&content=${{env.MSN}}"  
