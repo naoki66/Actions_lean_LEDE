@@ -105,8 +105,6 @@ jobs:
         echo ${{ steps.getHash.outputs.commitHash_Lede }} | tee .commitHash_Lede
         echo ${{ steps.getHash.outputs.commitHash_Lede_Package }} | tee .commitHash_Lede_Package
         echo ${{ steps.getHash.outputs.commitHash_Lede_Luci }} | tee .commitHash_Lede_Luci
-        echo ${{ steps.getHash.outputs.commitHash_OPENWRT_ROUTING }} | tee .commitHash_OPENWRT_ROUTING
-        echo ${{ steps.getHash.outputs.commitHash_OPENWRT_TELEPHONY }} | tee .commitHash_OPENWRT_TELEPHONY
         echo ${{ steps.getHash.outputs.commitHash_HelloWorld }} | tee .commitHash_HelloWorld
         echo ${{ steps.combHeader.outputs.commitHash_All }} | tee .commitHash_All
 
