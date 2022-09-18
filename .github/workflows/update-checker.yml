@@ -98,7 +98,7 @@ jobs:
     - name: Show Commit Head and Combination Heads
       id: combHeader
       run: |
-        echo "commitHash_smallprogramAction: ${{ steps.getHash.outputs.commitHash_smallprogramAction }}"
+        echo "commitHash_NEW_LEDE_Actions: ${{ steps.getHash.outputs.commitHash_NEW_LEDE_Actions }}"
         echo "commitHash_Lede: ${{ steps.getHash.outputs.commitHash_Lede }}"
         echo "commitHash_Lede_Package: ${{ steps.getHash.outputs.commitHash_Lede_Package }}"
         echo "commitHash_Lede_Luci: ${{ steps.getHash.outputs.commitHash_Lede_Luci }}"
@@ -106,7 +106,7 @@ jobs:
         echo "commitHash_OPENWRT_TELEPHONY: ${{ steps.getHash.outputs.commitHash_OPENWRT_TELEPHONY }}"
         echo "commitHash_HelloWorld: ${{ steps.getHash.outputs.commitHash_HelloWorld }}"
         echo "::set-output name=commitHash_All::\
-          ${{steps.getHash.outputs.commitHash_smallprogramAction}}\
+          ${{steps.getHash.outputs.commitHash_NEW_LEDE_Actions}}\
           ${{steps.getHash.outputs.commitHash_Lede}}\
           ${{steps.getHash.outputs.commitHash_Lede_Package}}\
           ${{steps.getHash.outputs.commitHash_Lede_Luci}}\
@@ -133,7 +133,6 @@ jobs:
         echo ${{ steps.getHash.outputs.commitHash_OPENWRT_TELEPHONY }} | tee .commitHash_OPENWRT_TELEPHONY
         echo ${{ steps.getHash.outputs.commitHash_HelloWorld }} | tee .commitHash_HelloWorld
         echo ${{ steps.combHeader.outputs.commitHash_All }} | tee .commitHash_All
-        echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
     - name: Delete workflow runs    #删除运行记录
       uses: GitRML/delete-workflow-runs@main
@@ -152,6 +151,8 @@ jobs:
    
     - name: pushplus notification     #pushplus推送
       if: steps.cacheHash.outputs.cache-hit != 'true' && !cancelled()
-      run: curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=lean源码有更新&content=${{env.DATE }}"  
+      run: |
+        echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
+        curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=lean源码有更新&content=${{env.DATE }}"  
 
 
