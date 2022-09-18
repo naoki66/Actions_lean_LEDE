@@ -1,21 +1,52 @@
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@naoki66 
+naoki66
+/
+OpenWrtAction
+Public
+forked from smallprogram/OpenWrtAction
+Code
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+Settings
+OpenWrtAction/.github/workflows/Update_Checker.yml
+@smallprogram
+smallprogram update
+Latest commit 3f55e4f 14 days ago
+ History
+ 1 contributor
+253 lines (210 sloc)  10.7 KB
+
 #
-# Copyright (c) 2019-2021 P3TERX <https://p3terx.com>
+#
+# Copyright (c) 2019-2022 P3TERX <https://p3terx.com>
 #
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
 #
 # https://github.com/P3TERX/Actions-OpenWrt
-# File: .github/workflows/update-checker.yml
+# File: .github/workflows/Update_Checker.yml
 # Description: Source code update checker
 #
 
-name: Update Checker
+name: Update_Checker
 
+env:
 
   # NEW_LEDE_Actions源码
-  REPO_URL_smallprogramAction: https://github.com/naoki66/NEW_LEDE_Actions.git
-  REPO_BRANCH_smallprogramAction: main
-  REPO_PATH_smallprogramAction : "NEW_LEDE_Actions"
+  REPO_URL_NEW_LEDE_Actions: https://github.com/naoki66/NEW_LEDE_Actions.git
+  REPO_BRANCH_NEW_LEDE_Actions: main
+  REPO_PATH_NEW_LEDE_Actions : "NEW_LEDE_Actions"
 
   # Lean源码
   REPO_URL_Lede: https://github.com/coolsnowwolf/lede
@@ -42,14 +73,30 @@ name: Update Checker
   REPO_BRANCH_OPENWRT_TELEPHONY: master
   REPO_PATH_OPENWRT_TELEPHONY : "telephony"
   
-   # helloworld源码
+   # SSRP源码
   REPO_URL_HelloWorld: https://github.com/fw876/helloworld
   REPO_BRANCH_HelloWorld: master
   REPO_PATH_HelloWorld : "helloworld"
 
+  # Passwall packages源码
+  #REPO_URL_PassWall_Packages: https://github.com/xiaorouji/openwrt-passwall
+  #REPO_BRANCH_PassWall_Packages: packages
+  #REPO_PATH_PassWall_Packages : "openwrt-passwall_packages"
+
+  # Passwall luci源码
+  #REPO_URL_PassWall_Luci: https://github.com/xiaorouji/openwrt-passwall
+  #REPO_BRANCH_PassWall_Luci: luci
+  #REPO_PATH_PassWall_Luci : "openwrt-passwall_luci"
+
+  # Passwall2源码
+  #REPO_URL_PassWall2: https://github.com/xiaorouji/openwrt-passwall2.git
+  #REPO_BRANCH_PassWall2: main
+  #REPO_PATH_PassWall2 : "openwrt-passwall2"
+
 
 
 on:
+  repository_dispatch:
   workflow_dispatch:
   schedule:
     - cron: 0 */6 * * *
@@ -60,12 +107,13 @@ jobs:
 
     steps:
 
-       - name: Get Commit Hash
+
+    - name: Get Commit Hash
       id: getHash
       run: |
         git clone --depth 1 $REPO_URL_NEW_LEDE_Actions -b $REPO_BRANCH_NEW_LEDE_Actions $REPO_PATH_NEW_LEDE_Actions
         cd $REPO_PATH_NEW_LEDE_Actions
-        echo "::set-output name=commitHash_smallprogramAction::$(git rev-parse HEAD)"
+        echo "::set-output name=commitHash_NEW_LEDE_Actions::$(git rev-parse HEAD)"
         cd
         git clone --depth 1 $REPO_URL_Lede -b $REPO_BRANCH_Lede $REPO_PATH_Lede
         cd $REPO_PATH_Lede
@@ -82,8 +130,7 @@ jobs:
         git clone --depth 1 $REPO_URL_OPENWRT_ROUTING -b $REPO_BRANCH_OPENWRT_ROUTING $REPO_PATH_OPENWRT_ROUTING
         cd $REPO_PATH_OPENWRT_ROUTING
         echo "::set-output name=commitHash_OPENWRT_ROUTING::$(git rev-parse HEAD)"
-        cd
-        
+        cd        
         git clone --depth 1 $REPO_URL_OPENWRT_TELEPHONY -b $REPO_BRANCH_OPENWRT_TELEPHONY $REPO_PATH_OPENWRT_TELEPHONY
         cd $REPO_PATH_OPENWRT_TELEPHONY
         echo "::set-output name=commitHash_OPENWRT_TELEPHONY::$(git rev-parse HEAD)"
@@ -92,41 +139,51 @@ jobs:
         cd $REPO_PATH_HelloWorld
         echo "::set-output name=commitHash_HelloWorld::$(git rev-parse HEAD)"
         cd
-
-        
-   #- name: Get Commit Hash
-   #   id: getHash
-   #   run: |
-   #     git clone --depth 1 $REPO_URL -b $REPO_BRANCH .
-   #     echo "::set-output name=commitHash::$(git rev-parse HEAD)"
-
-
-
+        git clone --depth 1 $REPO_URL_PassWall_Packages -b $REPO_BRANCH_PassWall_Packages $REPO_PATH_PassWall_Packages
+        cd $REPO_PATH_PassWall_Packages
+        echo "::set-output name=commitHash_PassWall_Package::$(git rev-parse HEAD)"
+        cd
+        git clone --depth 1 $REPO_URL_PassWall_Luci -b $REPO_BRANCH_PassWall_Luci $REPO_PATH_PassWall_Luci
+        cd $REPO_PATH_PassWall_Luci
+        echo "::set-output name=commitHash_PassWall_Luci::$(git rev-parse HEAD)"
+        cd
+        git clone --depth 1 $REPO_URL_PassWall2 -b $REPO_BRANCH_PassWall2 $REPO_PATH_PassWall2
+        cd $REPO_PATH_PassWall2
+        echo "::set-output name=commitHash_PassWall2::$(git rev-parse HEAD)"
+        cd
+ 
     - name: Show Commit Head and Combination Heads
       id: combHeader
       run: |
-        echo "commitHash_NEW_LEDE_Actions: ${{ steps.getHash.outputs.commitHash_NEW_LEDE_Actions }}"
+        echo "commitHash_smallprogramAction: ${{ steps.getHash.outputs.commitHash_smallprogramAction }}"
         echo "commitHash_Lede: ${{ steps.getHash.outputs.commitHash_Lede }}"
         echo "commitHash_Lede_Package: ${{ steps.getHash.outputs.commitHash_Lede_Package }}"
         echo "commitHash_Lede_Luci: ${{ steps.getHash.outputs.commitHash_Lede_Luci }}"
         echo "commitHash_OPENWRT_ROUTING: ${{ steps.getHash.outputs.commitHash_OPENWRT_ROUTING }}"
         echo "commitHash_OPENWRT_TELEPHONY: ${{ steps.getHash.outputs.commitHash_OPENWRT_TELEPHONY }}"
         echo "commitHash_HelloWorld: ${{ steps.getHash.outputs.commitHash_HelloWorld }}"
+        echo "commitHash_PassWall_Package: ${{ steps.getHash.outputs.commitHash_PassWall_Package }}"
+        echo "commitHash_PassWall_Luci: ${{ steps.getHash.outputs.commitHash_PassWall_Luci }}"
+        echo "commitHash_PassWall2: ${{ steps.getHash.outputs.commitHash_PassWall2 }}"
         echo "::set-output name=commitHash_All::\
-          ${{steps.getHash.outputs.commitHash_NEW_LEDE_Actions}}\
+          ${{steps.getHash.outputs.commitHash_smallprogramAction}}\
           ${{steps.getHash.outputs.commitHash_Lede}}\
           ${{steps.getHash.outputs.commitHash_Lede_Package}}\
           ${{steps.getHash.outputs.commitHash_Lede_Luci}}\
           ${{steps.getHash.outputs.commitHash_OPENWRT_ROUTING}}\
           ${{steps.getHash.outputs.commitHash_OPENWRT_TELEPHONY}}\
-          ${{steps.getHash.outputs.commitHash_HelloWorld}}
+          ${{steps.getHash.outputs.commitHash_HelloWorld}}\
+          ${{steps.getHash.outputs.commitHash_PassWall_Package}}\
+          ${{steps.getHash.outputs.commitHash_PassWall_Luci}}\
+          ${{steps.getHash.outputs.commitHash_PassWall2}}
           
     - name: Compare Commit Hash
       id: cacheHash
       uses: actions/cache@v2
       with:
-        path: .commitHash
-        key: HEAD-${{ steps.getHash.outputs.commitHash }}
+        path: .commitHash_All
+        key: HEAD-${{ steps.combHeader.outputs.commitHash_All }}
+   
 
     - name: Save New Commit Hash
       if: steps.cacheHash.outputs.cache-hit != 'true'
@@ -138,23 +195,29 @@ jobs:
         echo ${{ steps.getHash.outputs.commitHash_OPENWRT_ROUTING }} | tee .commitHash_OPENWRT_ROUTING
         echo ${{ steps.getHash.outputs.commitHash_OPENWRT_TELEPHONY }} | tee .commitHash_OPENWRT_TELEPHONY
         echo ${{ steps.getHash.outputs.commitHash_HelloWorld }} | tee .commitHash_HelloWorld
+        #echo ${{ steps.getHash.outputs.commitHash_PassWall_Package }} | tee .commitHash_PassWall_Package
+        #echo ${{ steps.getHash.outputs.commitHash_PassWall_Luci }} | tee .commitHash_PassWall_Luci
+        #echo ${{ steps.getHash.outputs.commitHash_PassWall2 }} | tee .commitHash_PassWall2
         echo ${{ steps.combHeader.outputs.commitHash_All }} | tee .commitHash_All
-        echo ${{ steps.getHash.outputs.commitHash }} | tee .commitHash
         echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
-    - name: Trigger build
+    - name: Delete workflow runs    #删除运行记录
+      uses: GitRML/delete-workflow-runs@main
+      with:
+        token: ${{ secrets.RELEASES_TOKEN }}
+        repository: ${{ github.repository }}
+        retain_days: 1
+        keep_minimum_runs: 2
+        
+    - name: Trigger build    #触发编译
       if: steps.cacheHash.outputs.cache-hit != 'true'
       uses: peter-evans/repository-dispatch@v1
       with:
         token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
-        event-type: Source Code Update
-
-    - name: Delete workflow runs
-      uses: GitRML/delete-workflow-runs@main
-      with:
-        retain_days: 1
-        keep_minimum_runs: 2
-     
+        event-type: OpenWrt Source Code Update
+   
     - name: pushplus notification     #pushplus推送
       if: steps.cacheHash.outputs.cache-hit != 'true' && !cancelled()
       run: curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=lean源码有更新&content=${{env.DATE }}"  
+
+
