@@ -43,8 +43,7 @@ jobs:
       if: steps.cacheHash.outputs.cache-hit != 'true'
       run: |
         echo ${{ steps.getHash.outputs.commitHash }} | tee .commitHash
-        useVersionInfo=$(git show -s --date=short --format="更新记录:<br/>更新人: %an<br/>更新时间: %cd<br/>更新内容: %s<br/>哈希值: %H")
-        echo "useVersionInfo=$useVersionInfo" >> $GITHUB_ENV
+        echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
     - name: Trigger build
       if: steps.cacheHash.outputs.cache-hit != 'true'
@@ -61,4 +60,4 @@ jobs:
      
     - name: pushplus notification     #pushplus推送
       if: steps.cacheHash.outputs.cache-hit != 'true' && !cancelled()
-      run: curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=lean源码有更新&content=${{env.useVersionInfo }}"  
+      run: curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=lean源码有更新&content=${{env.DATE }}"  
