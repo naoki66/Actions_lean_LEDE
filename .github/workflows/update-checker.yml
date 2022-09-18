@@ -126,10 +126,8 @@ jobs:
     - name: Delete workflow runs    #删除运行记录
       uses: GitRML/delete-workflow-runs@main
       with:
-        token: ${{ secrets.RELEASES_TOKEN }}
-        repository: ${{ github.repository }}
         retain_days: 1
-        keep_minimum_runs: 2
+        keep_minimum_runs: 1
         
     - name: Trigger build    #触发编译
       if: steps.cacheHash.outputs.cache-hit != 'true'
