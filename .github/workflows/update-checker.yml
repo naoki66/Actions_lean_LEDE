@@ -1,33 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@naoki66 
-naoki66
-/
-OpenWrtAction
-Public
-forked from smallprogram/OpenWrtAction
-Code
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-Settings
-OpenWrtAction/.github/workflows/Update_Checker.yml
-@smallprogram
-smallprogram update
-Latest commit 3f55e4f 14 days ago
- History
- 1 contributor
-253 lines (210 sloc)  10.7 KB
-
-#
 #
 # Copyright (c) 2019-2022 P3TERX <https://p3terx.com>
 #
