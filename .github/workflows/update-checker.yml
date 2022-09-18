@@ -107,6 +107,7 @@ jobs:
         echo ${{ steps.getHash.outputs.commitHash_Lede_Luci }} | tee .commitHash_Lede_Luci
         echo ${{ steps.getHash.outputs.commitHash_HelloWorld }} | tee .commitHash_HelloWorld
         echo ${{ steps.combHeader.outputs.commitHash_All }} | tee .commitHash_All
+        echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
     - name: Delete workflow runs    #删除运行记录
       uses: GitRML/delete-workflow-runs@main
@@ -123,8 +124,6 @@ jobs:
    
     - name: pushplus notification     #pushplus推送
       if: steps.cacheHash.outputs.cache-hit != 'true' && !cancelled()
-      run: |
-        echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
-        curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=lean源码有更新&content=${{env.DATE }}"  
+      run: curl "http://www.pushplus.plus/send?token=${{secrets.PUSHPLUS_TOKEN}}&title=lean源码有更新&content=${{env.DATE }}"  
 
 
