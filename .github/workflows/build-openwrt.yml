@@ -61,6 +61,19 @@ jobs:
         df -hT $PWD
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+        
+    - name: Cache    #actions cache缓存工具链
+      uses: klever1988/cachewrtbuild@main
+      with:
+        #是否一并缓存.ccache目录，如果你启用了ccache。这是唯一的常用参数，其他三个用于除错，一般不需要调整
+        ccache: 'true' 
+        #是否缓存工具链目录
+        toolchain: 'true'
+        #是否跳过工具链编译
+        skip: 'true'
+        #清空缓存
+        clean: 'false'
+        prefix: ${{ github.workspace }}/openwrt    
 
     - name: Load custom feeds     # 配置feeds
       run: |
@@ -91,6 +104,8 @@ jobs:
       id: package
       run: |
         cd openwrt
+        #开启ccache获得进一步的加速时间
+        echo -e 'CONFIG_DEVEL=y\nCONFIG_CCACHE=y' >> .config 
         make defconfig
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
