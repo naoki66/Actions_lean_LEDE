@@ -139,16 +139,15 @@ jobs:
       id: tag
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$RELEASE_TAG-$(date +"%Y.%m.%d-%H%M")"        
-        echo "## Update content" >> release.txt        
-        echo " Lean Openwrt Commit log  " >> release.txt
-        git -C openwrt log   >> release.txt        
-        echo " Lean Package Commit log " >> release.txt
-        git -C openwrt/feeds/packages log   >> release.txt        
+        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
+        echo " Lean Openwrt Commit" >> release.txt
+        git -C feeds/packages log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新记录:<br/>更新人: %an<br/>更新时间: %cd<br/>更新内容: %s<br/>哈希值: %H"  >> release.txt        
+        echo " Lean Package Commit" >> release.txt
+        git -C feeds/packages log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新记录:<br/>更新人: %an<br/>更新时间: %cd<br/>更新内容: %s<br/>哈希值: %H"  >> release.txt        
         echo " Lean Luci Commit log " >> release.txt
-        git -C openwrt/feeds/luci log   >> release.txt        
+        git -C feeds/packages log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新记录:<br/>更新人: %an<br/>更新时间: %cd<br/>更新内容: %s<br/>哈希值: %H"  >> release.txt        
         echo "  SSRP Commit log " >> release.txt
-        git -C openwrt/feeds/helloworld log >> release.txt
+        git -C feeds/packages log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新记录:<br/>更新人: %an<br/>更新时间: %cd<br/>更新内容: %s<br/>哈希值: %H" >> release.txt
         touch release.txt
         echo "::set-output name=status::success"
 
@@ -160,8 +159,8 @@ jobs:
       with:
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body_path: release.txt
-        files: ${{ env.FIRMWARE }}/*
-
+        files: ${{ env.FIRMWARE }}/*        
+      
     - name: Delete workflow runs     #删除workflow
       uses: GitRML/delete-workflow-runs@main
       with:
