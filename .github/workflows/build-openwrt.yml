@@ -162,7 +162,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled()
       env:
-        GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
       with:
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body_path: release.txt
@@ -171,7 +171,7 @@ jobs:
     - name: Delete workflow runs     #删除workflow
       uses: GitRML/delete-workflow-runs@main
       with:
-        token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
+        token: ${{ secrets.GITHUB_TOKEN  }}
         repository: ${{ github.repository }}
         retain_days: 1
         keep_minimum_runs: 3
@@ -183,7 +183,7 @@ jobs:
         keep_latest: 3
         delete_tags: true
       env:
-        GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
         
     - name: pushplus notification     #pushplus推送
       if: steps.tag.outputs.status == 'success' && !cancelled()
