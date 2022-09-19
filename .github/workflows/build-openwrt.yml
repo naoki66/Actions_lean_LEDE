@@ -139,30 +139,24 @@ jobs:
       id: tag
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$RELEASE_TAG-$(date +"%Y.%m.%d-%H%M")"
-        
-        echo "## Update content" >> release.txt
-        
+        echo "::set-output name=release_tag::$RELEASE_TAG-$(date +"%Y.%m.%d-%H%M")"        
+        echo "## Update content" >> release.txt        
         echo " Lean Openwrt Commit log  " >> release.txt
-        git -C openwrt log   >> release.txt
-        
+        git -C openwrt log   >> release.txt        
         echo " Lean Package Commit log " >> release.txt
-        git -C openwrt/feeds/packages log   >> release.txt
-        
+        git -C openwrt/feeds/packages log   >> release.txt        
         echo " Lean Luci Commit log " >> release.txt
-        git -C openwrt/feeds/luci log   >> release.txt
-        
+        git -C openwrt/feeds/luci log   >> release.txt        
         echo "  SSRP Commit log " >> release.txt
         git -C openwrt/feeds/helloworld log >> release.txt
-
         touch release.txt
         echo "::set-output name=status::success"
 
-    - name: Upload firmware to release  #上传release
+    - name: Upload firmware to release  #上传固件到release
       uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled()
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body_path: release.txt
