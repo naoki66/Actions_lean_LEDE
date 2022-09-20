@@ -187,9 +187,9 @@ jobs:
      
     - name: 读取更新内容文本
       run: |
-       echo 'FILE_TEXT<<EOF' >> $GITHUB_ENV
+       echo  "FILE_TEXT=<<EOF "  >> $GITHUB_ENV
        cat ./release.txt >> $GITHUB_ENV
-       echo 'EOF' >> $GITHUB_ENV
+       echo  "EOF" >> $GITHUB_ENV
        
     - name: pushplus推送
       if: steps.tag.outputs.status == 'success' && !cancelled()
