@@ -8,7 +8,7 @@
 # Description: Build OpenWrt using GitHub Actions
 #
 
-name: Build OpenWrt ALL
+name: OpenWrtX64
 
 on:
   repository_dispatch:
@@ -38,10 +38,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
+    - name: Checkout   #检查
       uses: actions/checkout@main
 
-    - name: Initialization environment  #配置运行环境
+    - name: Initialization environment  #初始化运行环境
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
@@ -56,36 +56,36 @@ jobs:
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
 
-    - name: Clone source code  #克隆源代码
+    - name: 克隆源代码
       working-directory: /workdir
       run: |
         df -hT $PWD
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         
-    - name: Cache    #actions cache缓存工具链
+    - name: Actions Cache缓存工具链
       uses: klever1988/cachewrtbuild@main
       with:
         ccache: 'true' 
         prefix: ${{ github.workspace }}/openwrt    
 
-    - name: Load custom feeds     # 配置feeds
+    - name: 载入配置feeds
       run: |
         [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
         chmod +x $DIY_P1_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P1_SH
 
-    - name: Update feeds    #更新feeds
+    - name: 更新feeds
       run: cd openwrt && ./scripts/feeds update -a
 
-    - name: Install feeds   #安装feeds、更新代码日期
+    - name: 安装feeds、更新日期
       run: |
        cd openwrt && ./scripts/feeds install -a
        echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
        echo "DATE1=$(date "+%Y.%m.%d")" >> $GITHUB_ENV
 
-    - name: Load custom configuration  #载入配置文件、标记日期
+    - name: 载入配置文件、生成固件日期
       run: |
         [ -e files ] && mv files openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
@@ -94,7 +94,7 @@ jobs:
         $GITHUB_WORKSPACE/$DIY_P2_SH
         sed -i 's/OpenWrt/Build ${{ env.DATE1 }} @ OpenWrt/g' package/lean/default-settings/files/zzz-default-settings
 
-    - name: Download package #下载包
+    - name: 下载软件包
       id: package
       run: |
         cd openwrt
@@ -103,7 +103,7 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
-    - name: Compile the firmware  #编译固件
+    - name: 编译固件
       id: compile
       run: |
         cd openwrt
@@ -115,18 +115,18 @@ jobs:
         echo "FILE_DATE= $(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
 
-    - name: Check space usage  #检查空间
+    - name: 检查空间
       if: (!cancelled())
       run: df -hT
 
-    - name: Upload bin directory  #上传bin文件
+    - name: 上传bin文件夹
       uses: actions/upload-artifact@main
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
         name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: openwrt/bin
 
-    - name: Organize files    #管理文件
+    - name: 整理文件
       id: organize
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
@@ -135,14 +135,14 @@ jobs:
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
-    - name: Upload firmware directory  #上传固件文件
+    - name: 上传固件文件
       uses: actions/upload-artifact@main
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
 
-    - name: Generate release tag  #创建release tag
+    - name: 创建release tag 生成更新信息
       id: tag
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
@@ -158,7 +158,7 @@ jobs:
         git -C openwrt/feeds/helloworld log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H" >> release.txt
         echo "::set-output name=status::success"
 
-    - name: Upload firmware to release  #上传固件到release
+    - name: 上传固件到release发布页
       uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled()
       env:
@@ -168,7 +168,7 @@ jobs:
         body_path: release.txt
         files: ${{ env.FIRMWARE }}/*        
       
-    - name: Delete workflow runs     #删除workflow
+    - name: 删除运行的工作流
       uses: GitRML/delete-workflow-runs@main
       with:
         token: ${{ secrets.ACTIONS_TRIGGER_PAT  }}
@@ -176,22 +176,22 @@ jobs:
         retain_days: 1
         keep_minimum_runs: 3
 
-    - name: Remove old Releases      #删除旧Releases
+    - name: 删除旧Releases
       uses: dev-drprasad/delete-older-releases@v0.1.0
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        keep_latest: 3
+        keep_latest: 4
         delete_tags: true
       env:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT  }}
      
-    - name: 读取更新内容文本
+    - name: 读取更新内容
       run: |
        echo  "FILE_TEXT=<<EOF "  >> $GITHUB_ENV
        cat ./release.txt >> $GITHUB_ENV
        echo  "EOF" >> $GITHUB_ENV
        
-    - name: pushplus推送
+    - name: pushplus推送消息
       if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
         curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"GitAction编译X64完成","content":" 在${{ env.DATE }} 编译成功！<br/>${{ env.FILE_TEXT }}","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
