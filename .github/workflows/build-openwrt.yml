@@ -148,14 +148,14 @@ jobs:
       run: |
         echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
         touch release.txt
-        echo " Lean Openwrt 更新记录:<br/>" >> release.txt
-        git -C openwrt log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>更新时间: %cd<br/>更新内容: %s<br/>哈希值: %H<br/>"  >> release.txt        
-        echo " Lean Package 更新记录:<br/>" >> release.txt
-        git -C openwrt/feeds/packages log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>更新时间: %cd<br/>更新内容: %s<br/>哈希值: %H<br/>"  >> release.txt        
-        echo " Lean Luci 更新记录:<br/>" >> release.txt
-        git -C openwrt/feeds/luci log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>更新时间: %cd<br/>更新内容: %s<br/>哈希值: %H<br/>"  >> release.txt        
-        echo "  SSRP 更新记录:<br/>" >> release.txt
-        git -C openwrt/feeds/helloworld log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>更新时间: %cd<br/>更新内容: %s<br/>哈希值: %H"<br/> >> release.txt
+        echo " Lean Openwrt 源码更新记录:<br/>" >> release.txt
+        git -C openwrt log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H"  >> release.txt        
+        echo " <br/>Lean Package 源码更新记录:<br/>" >> release.txt
+        git -C openwrt/feeds/packages log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H"  >> release.txt        
+        echo " <br/>Lean Luci 源码更新记录:<br/>" >> release.txt
+        git -C openwrt/feeds/luci log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H"  >> release.txt        
+        echo " <br/> SSRP 源码更新记录:<br/>" >> release.txt
+        git -C openwrt/feeds/helloworld log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H" >> release.txt
         echo "::set-output name=status::success"
 
     - name: Upload firmware to release  #上传固件到release
@@ -189,4 +189,5 @@ jobs:
       if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
         echo "PMessage=release.txt" >> $GITHUB_ENV   
-        curl -k --data token="${{ secrets.PUSHPLUS_TOKEN }}" --data title="[${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}]编译成功" --data "content=✨主人✨：您的固件顺利编译完成了✌️💯！(${{env.DATE}}),${{ env.PMessage }}" "http://www.pushplus.plus/send"
+        curl -k 'http://www.pushplus.plus/send?token=${{ secrets.PUSHPLUS_TOKEN }}&content=${{ secrets.PMessage }}'
+        
