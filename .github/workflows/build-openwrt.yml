@@ -188,6 +188,6 @@ jobs:
     - name: pushplus notification     #pushplus推送
       if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
-        echo "PMessage=release.txt" >> $GITHUB_ENV   
-        curl -k 'http://www.pushplus.plus/send?token=${{ secrets.PUSHPLUS_TOKEN }}&content=${{ secrets.PMessage }}'
-        
+        echo "PMessage=$(cat release.txt )" >> $GITHUB_ENV
+        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"GitAction编译X64完成","content":"${{ env.DATE }}编译成功！<br/>${{ env.PMessage }}","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
+
