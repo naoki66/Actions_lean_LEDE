@@ -194,5 +194,5 @@ jobs:
     - name: pushplus推送
       if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
-        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"GitAction编译X64完成","content":"$  在 {{ env.DATE }} 编译成功！<br/>{{ env.FILE_TEXT }}","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
+        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"GitAction编译X64完成","content":" 在${{ env.DATE }} 编译成功！<br/>${{ env.FILE_TEXT }}","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
 
