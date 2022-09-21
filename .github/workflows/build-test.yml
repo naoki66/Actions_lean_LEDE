@@ -163,7 +163,7 @@ jobs:
      
     - name: 读取更新内容
       run: |
-          echo "MY_STRING<<EOF" >> $GITHUB_ENV
+          echo "MY_STRING<-<EOF" >> $GITHUB_ENV
           cat ./release.txt >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
           echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
@@ -172,5 +172,6 @@ jobs:
     - name: Pushplus推送消息
       if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
+        echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
         curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"Gittest编译X64成功！","content":" 从${{ env.DATE }}开始到${{ env.DATE2 }}编译完成！<br/>更新内容：<br/>${{ env.MY_STRING }}","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
 
