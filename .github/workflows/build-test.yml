@@ -49,7 +49,7 @@ jobs:
         sudo -E apt-get -qq update
         #sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-2004)
         #sudo -E apt-get -qq install $(curl -fsSL https://raw.githubusercontent.com/naoki66/NEW_LEDE_Actions/master/depends-ubuntu )
-        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pip libpython3-dev qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
+        sudo -E apt-get -qq install bzip2 ccache cmake cpio curl gettext  git  p7zip p7zip-full patch pkgconf python2.7 python3 python3-pip libpython3-dev  subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd 
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
@@ -161,9 +161,9 @@ jobs:
      
     - name: 读取更新内容
       run: |
-       echo 'CONTENT_ENV<<EOF' >> $GITHUB_ENV
+       echo "CONTENT_ENV<<-EOF" >> $GITHUB_ENV
        cat release.txt >> $GITHUB_ENV
-       echo 'EOF' >> $GITHUB_ENV
+       echo "EOF" >> $GITHUB_ENV
        echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
        
