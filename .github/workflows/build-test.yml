@@ -28,9 +28,6 @@ env:
   CONFIG_FILE: x64.config
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
-  UPLOAD_BIN_DIR: false
-  UPLOAD_FIRMWARE: true
-  UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
 jobs:
@@ -38,10 +35,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout   #检查
+    - name: 检查
       uses: actions/checkout@main
 
-    - name: Initialization environment  #初始化运行环境
+    - name: 初始化运行环境
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
@@ -49,7 +46,7 @@ jobs:
         sudo -E apt-get -qq update
         #sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-2004)
         #sudo -E apt-get -qq install $(curl -fsSL https://raw.githubusercontent.com/naoki66/NEW_LEDE_Actions/master/depends-ubuntu )
-        sudo -E apt-get -qq install bzip2 ccache cmake cpio curl gettext  git  p7zip p7zip-full patch pkgconf python2.7 python3 python3-pip libpython3-dev  subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd 
+        sudo -E apt-get -qq install bzip2 cmake cpio curl gettext  git  patch python2.7 python3 python3-pip libpython3-dev  subversion swig texinfo  upx-ucl unzip vim wget  
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
@@ -71,12 +68,10 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P1_SH
 
-    - name: 更新feeds
-      run: cd openwrt && ./scripts/feeds update -a
-
-    - name: 安装feeds、更新日期
+    - name: 更新feeds\安装feeds、更新日期
       run: |
-       cd openwrt && ./scripts/feeds install -a
+       cd openwrt 
+       ./scripts/feeds update -a  &&  ./scripts/feeds install -a
        echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
        echo "DATE1=$(date "+%Y.%m.%d.%H:%M")" >> $GITHUB_ENV
 
@@ -87,60 +82,15 @@ jobs:
         chmod +x $DIY_P2_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
-
-    - name: 下载软件包
-      id: package
-      run: |
-        cd openwrt
         make defconfig
 
-    - name: 编译固件
+    - name: 编译
       id: compile
       run: |
         cd openwrt
         echo "FILE_DATE= $(date +"%Y%m%d.%H%M")" >> $GITHUB_ENV
         echo "::set-output name=status::success"
-
-
-    - name: 检查空间
-      if: (!cancelled())
-      run: df -hT
-
-
-
-    - name: 整理文件
-      id: organize
-      if: steps.compile.outputs.status == 'success'  && !cancelled()
-      run: |
-        echo "::set-output name=status::success"
-
-
-
-    - name: 创建release tag 生成更新信息
-      id: tag
-      if: steps.compile.outputs.status == 'success'  && !cancelled()
-      run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
-        touch release.txt
-        echo " Lean Openwrt 源码记录:" >> release.txt
-        git -C openwrt log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H <br/>"  >> release.txt        
-        echo " <br/>Lean Package 源码记录:" >> release.txt
-        git -C openwrt/feeds/packages log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H <br/>"  >> release.txt        
-        echo " <br/>Lean Luci 源码新记录:" >> release.txt
-        git -C openwrt/feeds/luci log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H <br/>"  >> release.txt        
-        echo " <br/> SSRP 源码记录:" >> release.txt
-        git -C openwrt/feeds/helloworld log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H <br/>" >> release.txt
-        echo "::set-output name=status::success"
-
-    - name: 上传固件到release发布页
-      uses: softprops/action-gh-release@v1
-      if: steps.tag.outputs.status == 'success' && !cancelled()
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}
-      with:
-        tag_name: ${{ steps.tag.outputs.release_tag }}
-        body_path: release.txt
-        files: release.txt        
+   
       
     - name: 删除运行的工作流
       uses: GitRML/delete-workflow-runs@main
@@ -150,14 +100,6 @@ jobs:
         retain_days: 1
         keep_minimum_runs: 2
 
-    - name: 删除旧Releases
-      uses: dev-drprasad/delete-older-releases@v0.1.0
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
-      with:
-        keep_latest: 3
-        delete_tags: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT  }}
      
     - name: 读取更新内容
       run: |
