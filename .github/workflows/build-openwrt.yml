@@ -83,7 +83,7 @@ jobs:
       run: |
        cd openwrt && ./scripts/feeds install -a
        echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
-       echo "DATE1=$(date "+%Y.%m.%d")" >> $GITHUB_ENV
+       echo "DATE1=$(date "+%Y.%m.%d.%H:%M")" >> $GITHUB_ENV
 
     - name: 载入配置文件、生成固件日期
       run: |
@@ -92,7 +92,7 @@ jobs:
         chmod +x $DIY_P2_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
-        sed -i 's/OpenWrt/Build ${{ env.DATE1 }} @ OpenWrt/g' package/lean/default-settings/files/zzz-default-settings
+        sed -i 's/OpenWrt/Build${{ env.DATE1 }} @ OpenWrt/g' package/lean/default-settings/files/zzz-default-settings
 
     - name: 下载软件包
       id: package
@@ -112,7 +112,7 @@ jobs:
         echo "::set-output name=status::success"
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
-        echo "FILE_DATE= $(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+        echo "FILE_DATE= $(date +"%Y%m%d.%H%M")" >> $GITHUB_ENV
 
 
     - name: 检查空间
