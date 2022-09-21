@@ -148,14 +148,14 @@ jobs:
       run: |
         echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
         touch release.txt
-        echo " Lean Openwrt 源码更新记录:<br/>" >> release.txt
-        git -C openwrt log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H"  >> release.txt        
-        echo " <br/>Lean Package 源码更新记录:<br/>" >> release.txt
-        git -C openwrt/feeds/packages log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H"  >> release.txt        
-        echo " <br/>Lean Luci 源码更新记录:<br/>" >> release.txt
-        git -C openwrt/feeds/luci log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H"  >> release.txt        
-        echo " <br/> SSRP 源码更新记录:<br/>" >> release.txt
-        git -C openwrt/feeds/helloworld log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H" >> release.txt
+        echo " Lean Openwrt 源码更新记录:" >> release.txt
+        git -C openwrt log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H <br/>"  >> release.txt        
+        echo " <br/>Lean Package 源码更新记录:" >> release.txt
+        git -C openwrt/feeds/packages log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H <br/>"  >> release.txt        
+        echo " <br/>Lean Luci 源码更新记录:" >> release.txt
+        git -C openwrt/feeds/luci log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H <br/>"  >> release.txt        
+        echo " <br/> SSRP 源码更新记录:" >> release.txt
+        git -C openwrt/feeds/helloworld log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H <br/>" >> release.txt
         echo "::set-output name=status::success"
 
     - name: 上传固件到release发布页
@@ -187,12 +187,14 @@ jobs:
      
     - name: 读取更新内容
       run: |
-       echo  "FILE_TEXT=<<EOF "  >> $GITHUB_ENV
-       cat ./release.txt >> $GITHUB_ENV
-       echo  "EOF" >> $GITHUB_ENV
+          echo "MY_STRING<<EOF" >> $GITHUB_ENV
+          cat ./release.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
+
        
-    - name: pushplus推送消息
+    - name: Pushplus推送消息
       if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
-        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"GitAction编译X64完成","content":" 在${{ env.DATE }} 编译成功！<br/>${{ env.FILE_TEXT }}","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
+        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"GitAction编译X64成功！","content":" 从${{ env.DATE }}开始到${{ env.DATE2 }}编译完成！<br/>更新内容：<br/>${{ env.MY_STRING }}","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
 
