@@ -18,8 +18,8 @@ on:
         description: 'SSH connection to Actions'
         required: false
         default: 'false'
-  schedule:
-   - cron: 30 23 * * *
+ # schedule:
+ #- cron: 30 23 * * *
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -46,9 +46,7 @@ jobs:
         sudo -E apt-get -qq update
         #sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-2004)
         #sudo -E apt-get -qq install $(curl -fsSL https://raw.githubusercontent.com/naoki66/NEW_LEDE_Actions/master/depends-ubuntu )
-        sudo -E apt-get -qq install bzip2 cmake cpio curl gettext  git  patch python2.7 python3 python3-pip libpython3-dev  subversion swig texinfo  upx-ucl unzip vim wget  
-        sudo -E apt-get -qq autoremove --purge
-        sudo -E apt-get -qq clean
+        sudo -E apt-get -qq install bzip2  cpio curl gettext  git   subversion swig texinfo  unzip vim wget  
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
@@ -84,22 +82,6 @@ jobs:
         $GITHUB_WORKSPACE/$DIY_P2_SH
         make defconfig
 
-    - name: 编译
-      id: compile
-      run: |
-        cd openwrt
-        echo "FILE_DATE= $(date +"%Y%m%d.%H%M")" >> $GITHUB_ENV
-        echo "::set-output name=status::success"
-   
-      
-    - name: 删除运行的工作流
-      uses: GitRML/delete-workflow-runs@main
-      with:
-        token: ${{ secrets.ACTIONS_TRIGGER_PAT  }}
-        repository: ${{ github.repository }}
-        retain_days: 1
-        keep_minimum_runs: 2
-
      
     - name: 读取更新内容
       run: |
@@ -119,7 +101,6 @@ jobs:
 
        
     - name: Pushplus推送消息
-      if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
         echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
         curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"Gittest编译X64成功！","content":" 从${{ env.DATE }}开始到${{ env.DATE2 }}编译完成！<br/>$(cat ./AAA.txt)","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
