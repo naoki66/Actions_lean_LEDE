@@ -8,7 +8,7 @@
 # Description: Build OpenWrt using GitHub Actions
 #
 
-name: OpenWrttest
+name: TEST
 
 on:
   repository_dispatch:
@@ -112,8 +112,6 @@ jobs:
       id: organize
       if: steps.compile.outputs.status == 'success'  && !cancelled()
       run: |
-        cd openwrt/bin/targets/*/*
-        rm -rf packages
         echo "::set-output name=status::success"
 
 
@@ -163,10 +161,10 @@ jobs:
      
     - name: 读取更新内容
       run: |
-          echo "MY_STRING<-<EOF" >> $GITHUB_ENV
-          cat ./release.txt >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-          echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
+       echo 'CONTENT_ENV<<EOF' >> $GITHUB_ENV
+       cat release.txt >> $GITHUB_ENV
+       echo 'EOF' >> $GITHUB_ENV
+       echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
        
     - name: Pushplus推送消息
