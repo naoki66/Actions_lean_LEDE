@@ -161,15 +161,24 @@ jobs:
      
     - name: 读取更新内容
       run: |
-       echo "CONTENT_ENV<<-EOF" >> $GITHUB_ENV
-       cat release.txt >> $GITHUB_ENV
-       echo "EOF" >> $GITHUB_ENV
-       echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
+        touch AAA.txt
+        echo " Lean源码记录:" >> AAA.txt
+        git -C openwrt log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人:%an<br/>时间:%cd<br/>更新内容:%s<br/>"  >> AAA.txt        
+        echo " <br/>LeanPackag源码记录:" >> release.txt
+        git -C openwrt/feeds/packages log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容:%s<br/>"  >> AAA.txt        
+        echo " <br/>LeanLuci源码新记录:" >> release.txt
+        git -C openwrt/feeds/luci log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容:%s<br/>"  >> AAA.txt        
+        echo " <br/>SSRP源码记录:" >> release.txt
+        git -C openwrt/feeds/helloworld log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>" >> AAA.txt
+        echo "AAAMESSGE<<EOF" >> $GITHUB_ENV
+        cat AAA.txt >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+        echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
        
     - name: Pushplus推送消息
       if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
         echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
-        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"Gittest编译X64成功！","content":" 从${{ env.DATE }}开始到${{ env.DATE2 }}编译完成！<br/>更新内容：<br/>${{ env.MY_STRING }}","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
+        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"Gittest编译X64成功！","content":" 从${{ env.DATE }}开始到${{ env.DATE2 }}编译完成！<br/>${{ env.AAAMESSGE }}","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
 
