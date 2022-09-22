@@ -18,8 +18,8 @@ on:
         description: 'SSH connection to Actions'
         required: false
         default: 'false'
-  schedule:
-   - cron: 30 21 * * *
+  #schedule:
+  # - cron: 30 21 * * *
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -148,14 +148,14 @@ jobs:
       run: |
         echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
         touch release.txt
-        echo " Lean Openwrt 源码更新记录:" >> release.txt
-        git -C openwrt log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H <br/>"  >> release.txt        
-        echo " <br/>Lean Package 源码更新记录:" >> release.txt
-        git -C openwrt/feeds/packages log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H <br/>"  >> release.txt        
-        echo " <br/>Lean Luci 源码更新记录:" >> release.txt
-        git -C openwrt/feeds/luci log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H <br/>"  >> release.txt        
-        echo " <br/> SSRP 源码更新记录:" >> release.txt
-        git -C openwrt/feeds/helloworld log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"<br/>更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H <br/>" >> release.txt
+        echo " Lean Openwrt 源码更新记录:<br/>" >> release.txt
+        git -C openwrt log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H "  >> release.txt        
+        echo " <br/>Lean Package 源码更新记录:<br/>" >> release.txt
+        git -C openwrt/feeds/packages log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H "  >> release.txt        
+        echo " <br/>Lean Luci 源码更新记录:<br/>" >> release.txt
+        git -C openwrt/feeds/luci log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H "  >> release.txt        
+        echo " <br/>SSRP 源码更新记录:<br/>" >> release.txt
+        git -C openwrt/feeds/helloworld log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H " >> release.txt
         echo "::set-output name=status::success"
 
     - name: 上传固件到release发布页
