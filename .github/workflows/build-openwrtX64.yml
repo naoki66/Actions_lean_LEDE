@@ -63,7 +63,7 @@ jobs:
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         
-    - name: Actions Cache缓存工具链
+    - name: 对比工具链缓存
       uses: klever1988/cachewrtbuild@main
       with:
         ccache: 'true' 
@@ -85,7 +85,7 @@ jobs:
        echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
        echo "DATE1=$(date "+%Y.%m.%d.%H:%M")" >> $GITHUB_ENV
 
-    - name: 载入配置文件、生成固件日期
+    - name: 载入配置文件、修改固件日期
       run: |
         [ -e files ] && mv files openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
@@ -157,7 +157,8 @@ jobs:
         echo " <br/>SSRP 源码更新记录:<br/>" >> release.txt
         git -C openwrt/feeds/helloworld log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H " >> release.txt
         echo "::set-output name=status::success"
-
+        echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
+       
     - name: 上传固件到release发布页
       uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled()
@@ -189,6 +190,5 @@ jobs:
     - name: Pushplus推送通知
       if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
-        echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
         curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"GitAction编译X64成功！","content":" 从${{ env.DATE }}开始到${{ env.DATE2 }}编译完成！","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
 
