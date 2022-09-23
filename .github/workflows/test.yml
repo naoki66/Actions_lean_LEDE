@@ -100,8 +100,8 @@ jobs:
         echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
        
-    - name: Pushplus推送消息
-      run: |
-        echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
-        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"Gittest编译X64成功！","content":" 从${{ env.DATE }}开始到${{ env.DATE2 }}编译完成！<br/>${cat ./AAA.txt}","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
+    #- name: Pushplus推送消息
+    #  run: |
+    #    echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
+    #    curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"Gittest编译X64成功！","content":" 从${{ env.DATE }}开始到${{ env.DATE2 }}编译完成！<br/>${cat ./AAA.txt}","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
 
