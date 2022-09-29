@@ -9,7 +9,7 @@
 # Description: Source code update checker
 #
 
-name: Update_Checker
+name: 更新检查
 
 env:
   
@@ -56,7 +56,7 @@ jobs:
     steps:
 
 
-    - name: Get Commit Hash
+    - name: 获取Commit Hash
       id: getHash
       run: |
         git clone --depth 1 $REPO_URL_Lede -b $REPO_BRANCH_Lede $REPO_PATH_Lede
@@ -76,7 +76,7 @@ jobs:
         echo "::set-output name=commitHash_HelloWorld::$(git rev-parse HEAD)"
         cd
  
-    - name: Show Commit Head and Combination Heads
+    - name: 显示Commit Head and Combination Heads
       id: combHeader
       run: |
         echo "commitHash_Lede: ${{ steps.getHash.outputs.commitHash_Lede }}"
@@ -89,7 +89,7 @@ jobs:
           ${{steps.getHash.outputs.commitHash_Lede_Luci}}\
           ${{steps.getHash.outputs.commitHash_HelloWorld}}"
           
-    - name: Compare Commit Hash
+    - name: 对比Commit Hash
       id: cacheHash
       uses: actions/cache@v2
       with:
@@ -97,7 +97,7 @@ jobs:
         key: HEAD-${{ steps.combHeader.outputs.commitHash_All }}
    
 
-    - name: Save New Commit Hash
+    - name: 保存新的Commit Hash
       if: steps.cacheHash.outputs.cache-hit != 'true'
       run: |
         echo ${{ steps.getHash.outputs.commitHash_Lede }} | tee .commitHash_Lede
@@ -107,20 +107,20 @@ jobs:
         echo ${{ steps.combHeader.outputs.commitHash_All }} | tee .commitHash_All
         echo "DATE22=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
-    - name: Delete workflow runs    #删除运行记录
+    - name: 删除运行记录
       uses: GitRML/delete-workflow-runs@main
       with:
         retain_days: 1
         keep_minimum_runs: 1
         
-    - name: Trigger build    #触发编译
+    - name: 触发编译
       if: steps.cacheHash.outputs.cache-hit != 'true'
       uses: peter-evans/repository-dispatch@v1
       with:
         token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
         event-type: OpenWrt Source Code Update
    
-    - name: pushplus notification     #pushplus推送
+    - name: pushplus推送
       if: steps.cacheHash.outputs.cache-hit != 'true' && !cancelled()
       run: |
        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"lede源码有更新","content":"${{ env.DATE22 }}触发编译！","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
