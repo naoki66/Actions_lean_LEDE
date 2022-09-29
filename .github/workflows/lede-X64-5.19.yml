@@ -140,9 +140,9 @@ jobs:
       id: tag
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
+        echo "::set-output name=release_tag::K5.19$(date +"%Y.%m.%d-%H%M")"
         touch release.txt
-        echo " Lean Openwrt 源码更新记录:" >> release.txt
+        echo " Lean Openwrt K5.19源码更新记录:" >> release.txt
         git -C openwrt log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H "  >> release.txt        
         echo " <br/>Lean Package 源码更新记录:" >> release.txt
         git -C openwrt/feeds/packages log -1 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H "  >> release.txt        
@@ -184,4 +184,4 @@ jobs:
     - name: Pushplus推送通知
       if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
-        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"GitAction编译X64成功！","content":" 从${{ env.DATE }}开始到${{ env.DATE2 }}编译完成！","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
+        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"GitAction编译X64K5.19成功！","content":" 从${{ env.DATE }}开始到${{ env.DATE2 }}编译完成！","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
