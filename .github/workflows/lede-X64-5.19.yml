@@ -143,13 +143,13 @@ jobs:
         echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-K5.19"
         touch release.txt
         echo " Lean Openwrt K5.19源码更新记录:" >> release.txt
-        git -C openwrt log -2 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H "  >> release.txt        
+        git -C openwrt log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H "  >> release.txt        
         echo " <br/>Lean Package 源码更新记录:" >> release.txt
-        git -C openwrt/feeds/packages log -2 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H "  >> release.txt        
+        git -C openwrt/feeds/packages log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H "  >> release.txt        
         echo " <br/>Lean Luci 源码更新记录:" >> release.txt
-        git -C openwrt/feeds/luci log -2 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H "  >> release.txt        
+        git -C openwrt/feeds/luci log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H "  >> release.txt        
         echo " <br/>SSRP 源码更新记录:" >> release.txt
-        git -C openwrt/feeds/helloworld log -2 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H " >> release.txt
+        git -C openwrt/feeds/helloworld log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人: %an<br/>时间: %cd<br/>更新内容: %s<br/>哈希值: %H " >> release.txt
         echo "::set-output name=status::success"
         echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
        
