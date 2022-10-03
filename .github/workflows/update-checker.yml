@@ -47,7 +47,7 @@ env:
 on:
   workflow_dispatch:
   schedule:
-    - cron: 30 2/4 * * *
+    - cron: 30 2/3 * * *
 
 jobs:
   check:
@@ -118,7 +118,7 @@ jobs:
       uses: peter-evans/repository-dispatch@v1
       with:
         token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
-        event-type: OpenWrt Source Code Update
+        event-type: 上游源码更新触发编译
    
     - name: pushplus推送
       if: steps.cacheHash.outputs.cache-hit != 'true' && !cancelled()
