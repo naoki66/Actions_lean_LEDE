@@ -81,7 +81,7 @@ jobs:
       run: |
        cd openwrt && ./scripts/feeds install -a
        echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
-       echo "DATE1=$(date "+%Y.%m.%d.%H:%M")" >> $GITHUB_ENV
+       echo "DATE1=$(date "+%Y.%m.%d-%H:%M")" >> $GITHUB_ENV
     - name: 载入配置文件、修改固件日期
       run: |
         [ -e files ] && mv files openwrt/files
