@@ -35,6 +35,6 @@ sed -i 's/echo $h/echo $g/g' package/lean/autocore/files/x86/autocore
 
 
 #升级smartdns版本到最新Commits on Sep 29, 2022
-sed -i 's/1.2022.38/2022.10.8/g' feeds/packages/net/smartdns/Makefile
-sed -i 's/1991a0b102e891f149647b162897bf4403f8f66c/8523f26c621d535ac1f13970196ef53b4483fcdf/g' feeds/packages/net/smartdns/Makefile
+sed -i 's/1.2022.38/2022.10.20/g' feeds/packages/net/smartdns/Makefile
+sed -i 's/1991a0b102e891f149647b162897bf4403f8f66c/51e1ba6897d40f078f4c32a70c1544865f1b4098/g' feeds/packages/net/smartdns/Makefile
 sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
