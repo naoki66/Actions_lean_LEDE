@@ -17,6 +17,11 @@ sed -i 's/192.168.1.1/192.168.10.1/g' package/base-files/files/bin/config_genera
 #sed -i 's/^#\(.*mwan.htm\)/\1/' package/lean/default-settings/files/zzz-default-settings
 #sed -i 's/^#\(.*upnp.htm\)/\1/' package/lean/default-settings/files/zzz-default-settings
 #sed -i 's/^#\(.*ddns.htm\)/\1/' package/lean/default-settings/files/zzz-default-settings
+sed -i '13c '  package/lean/default-settings/files/zzz-default-settings
+sed -i '14c '  package/lean/default-settings/files/zzz-default-settings
+sed -i '15c '  package/lean/default-settings/files/zzz-default-settings
+
+
 
 # 日期
 sed -i 's/os.date(/&"%Y-%m-%d %H:%M:%S"/' package/lean/autocore/files/x86/index.htm
