@@ -34,9 +34,9 @@ git clone -b lede https://github.com/pymumu/luci-app-smartdns.git package/applic
 #git clone https://github.com/shidahuilang/luci-app-autoupdate.git package/applications/luci-app-autoupdate
 
 # 恢复主机型号
-sed -i 's/(dmesg | grep .*/{a}${b}${c}${d}${e}${f}/g' package/lean/autocore/files/x86/autocore
-sed -i '/h=${g}.*/d' package/lean/autocore/files/x86/autocore
-sed -i 's/echo $h/echo $g/g' package/lean/autocore/files/x86/autocore
+#sed -i 's/(dmesg | grep .*/{a}${b}${c}${d}${e}${f}/g' package/lean/autocore/files/x86/autocore
+#sed -i '/h=${g}.*/d' package/lean/autocore/files/x86/autocore
+#sed -i 's/echo $h/echo $g/g' package/lean/autocore/files/x86/autocore
 
 
 #升级smartdns版本到最新2022/11/11
