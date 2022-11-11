@@ -43,6 +43,10 @@ env:
   REPO_BRANCH_HelloWorld: master
   REPO_PATH_HelloWorld : "helloworld"
 
+   # smartdns源码
+  REPO_URL_smartdns: https://github.com/pymumu/smartdns
+  REPO_BRANCH_HelloWorld: master
+  REPO_PATH_smartdns : "smartdns"
 
 on:
   workflow_dispatch:
@@ -75,6 +79,10 @@ jobs:
         cd $REPO_PATH_HelloWorld
         echo "::set-output name=commitHash_HelloWorld::$(git rev-parse HEAD)"
         cd
+        git clone --depth 1 $REPO_URL_smartdns -b $REPO_BRANCH_smartdns $REPO_PATH_smartdns 
+        cd $REPO_PATH_smartdns
+        echo "::set-output name=commitHash_smartdns::$(git rev-parse HEAD)"
+        cd
  
     - name: 显示Commit Head and Combination Heads
       id: combHeader
@@ -83,11 +91,13 @@ jobs:
         echo "commitHash_Lede_Package: ${{ steps.getHash.outputs.commitHash_Lede_Package }}"
         echo "commitHash_Lede_Luci: ${{ steps.getHash.outputs.commitHash_Lede_Luci }}"
         echo "commitHash_HelloWorld: ${{ steps.getHash.outputs.commitHash_HelloWorld }}"
+        echo "commitHash_smartdns: ${{ steps.getHash.outputs.commitHash_smartdns }}"
         echo "::set-output name=commitHash_All::\
           ${{steps.getHash.outputs.commitHash_Lede}}\
           ${{steps.getHash.outputs.commitHash_Lede_Package}}\
           ${{steps.getHash.outputs.commitHash_Lede_Luci}}\
-          ${{steps.getHash.outputs.commitHash_HelloWorld}}"
+          ${{steps.getHash.outputs.commitHash_HelloWorld}}\
+          ${{steps.getHash.outputs.commitHash_smartdns}}"
           
     - name: 对比Commit Hash
       id: cacheHash
@@ -104,6 +114,7 @@ jobs:
         echo ${{ steps.getHash.outputs.commitHash_Lede_Package }} | tee .commitHash_Lede_Package
         echo ${{ steps.getHash.outputs.commitHash_Lede_Luci }} | tee .commitHash_Lede_Luci
         echo ${{ steps.getHash.outputs.commitHash_HelloWorld }} | tee .commitHash_HelloWorld
+        echo ${{ steps.getHash.outputs.commitHash_smartdns }} | tee .commitHash_smartdns
         echo ${{ steps.combHeader.outputs.commitHash_All }} | tee .commitHash_All
         echo "DATE22=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
