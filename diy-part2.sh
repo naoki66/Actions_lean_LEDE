@@ -32,6 +32,7 @@ sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' package/lean/default-settings/files/zzz
 #添加额外软件包
 git clone -b lede https://github.com/pymumu/luci-app-smartdns.git package/applications/luci-app-smartdns
 #git clone https://github.com/shidahuilang/luci-app-autoupdate.git package/applications/luci-app-autoupdate
+git clone https://github.com/pymumu/smartdns package/applications/smartdns
 
 # 恢复主机型号
 #sed -i 's/(dmesg | grep .*/{a}${b}${c}${d}${e}${f}/g' package/lean/autocore/files/x86/autocore
