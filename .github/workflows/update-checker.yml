@@ -45,7 +45,7 @@ env:
 
    # smartdns源码
   REPO_URL_smartdns: https://github.com/pymumu/smartdns
-  REPO_BRANCH_HelloWorld: master
+  REPO_BRANCH_smartdns: master
   REPO_PATH_smartdns : "smartdns"
 
 on:
