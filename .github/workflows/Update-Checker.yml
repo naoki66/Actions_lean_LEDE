@@ -54,7 +54,7 @@ jobs:
         echo "commitHash_Lede_Package: ${{ steps.getHash.outputs.commitHash_Lede_Package }}"
         echo "commitHash_Lede_Luci: ${{ steps.getHash.outputs.commitHash_Lede_Luci }}"
         echo "commitHash_HelloWorld: ${{ steps.getHash.outputs.commitHash_HelloWorld }}"
-        echo "commitHash_All=${{steps.getHash.outputs.commitHash_Lede}}\${{steps.getHash.outputs.commitHash_Lede_Package}}\${{steps.getHash.outputs.commitHash_Lede_Luci}}\${{steps.getHash.outputs.commitHash_HelloWorld}}" >> $GITHUB_OUTPUT
+        echo "commitHash_All=${{steps.getHash.outputs.commitHash_Lede}} ，${{steps.getHash.outputs.commitHash_Lede_Package}} ，${{steps.getHash.outputs.commitHash_Lede_Luci}} ，${{steps.getHash.outputs.commitHash_HelloWorld}}" >> $GITHUB_OUTPUT
 
           
     - name: 对比Commit Hash
@@ -62,7 +62,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: .commitHash_All
-        key: HEAD-${{ steps.combHeader.outputs.commitHash_All }}
+        key: HEAD-${{steps.combHeader.outputs.commitHash_All}}
    
 
     - name: 保存新的Commit Hash
