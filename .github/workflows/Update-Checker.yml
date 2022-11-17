@@ -22,7 +22,6 @@ jobs:
 
     steps:
 
-
     - name: 获取Commit Hash
       id: getHash
       run: |
@@ -47,19 +46,14 @@ jobs:
         cd
 
  
-    - name: 显示Commit Head and Combination Heads
+    - name: 整理Hash
       id: combHeader
       run: |
-        echo "commitHash_Lede: ${{ steps.getHash.outputs.commitHash_Lede }}"
-        echo "commitHash_Lede_Package: ${{ steps.getHash.outputs.commitHash_Lede_Package }}"
-        echo "commitHash_Lede_Luci: ${{ steps.getHash.outputs.commitHash_Lede_Luci }}"
-        echo "commitHash_HelloWorld: ${{ steps.getHash.outputs.commitHash_HelloWorld }}"
         echo "commitHash_All=${{steps.getHash.outputs.commitHash_Lede}} ，${{steps.getHash.outputs.commitHash_Lede_Package}} ，${{steps.getHash.outputs.commitHash_Lede_Luci}} ，${{steps.getHash.outputs.commitHash_HelloWorld}}" >> $GITHUB_OUTPUT
-
           
     - name: 对比Commit Hash
       id: cacheHash
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: .commitHash_All
         key: HEAD-${{steps.combHeader.outputs.commitHash_All}}
@@ -73,7 +67,6 @@ jobs:
         echo ${{ steps.getHash.outputs.commitHash_Lede_Luci }} | tee .commitHash_Lede_Luci
         echo ${{ steps.getHash.outputs.commitHash_HelloWorld }} | tee .commitHash_HelloWorld
         echo ${{ steps.combHeader.outputs.commitHash_All }} | tee .commitHash_All
-        echo "DATE22=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
     - name: 删除运行记录
       uses: GitRML/delete-workflow-runs@main
@@ -87,10 +80,4 @@ jobs:
       with:
         token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
         event-type: 上游源码更新触发编译
-   
-    - name: pushplus推送
-      if: steps.cacheHash.outputs.cache-hit != 'true' && !cancelled()
-      run: |
-       curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"lede源码有更新","content":"${{ env.DATE22 }}触发编译！","token":"${{ secrets.PUSHPLUS_TOKEN }}"}'
-
 
