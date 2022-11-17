@@ -12,41 +12,7 @@
 name: 更新检查
 
 env:
-  
-  # Lean源码
-  REPO_URL_Lede: https://github.com/coolsnowwolf/lede
-  REPO_BRANCH_Lede: master
-  REPO_PATH_Lede : "lede"
 
-  # Lean Package源码
-  REPO_URL_Lede_Package: https://github.com/coolsnowwolf/packages
-  REPO_BRANCH_Lede_Package: master
-  REPO_PATH_Lede_Package : "ledepackage"
-
-  # Lean luci源码
-  REPO_URL_Lede_Luci: https://github.com/coolsnowwolf/luci
-  REPO_BRANCH_Lede_Luci: master
-  REPO_PATH_Lede_Luci : "luci"
-
-  # Openwrt routing源码
-  REPO_URL_OPENWRT_ROUTING: https://git.openwrt.org/feed/routing.git
-  REPO_BRANCH_OPENWRT_ROUTING: master
-  REPO_PATH_OPENWRT_ROUTING : "routing"
-
-  # Openwrt telephony源码
-  REPO_URL_OPENWRT_TELEPHONY: https://git.openwrt.org/feed/telephony.git
-  REPO_BRANCH_OPENWRT_TELEPHONY: master
-  REPO_PATH_OPENWRT_TELEPHONY : "telephony"
-  
-   # SSRP源码
-  REPO_URL_HelloWorld: https://github.com/fw876/helloworld
-  REPO_BRANCH_HelloWorld: master
-  REPO_PATH_HelloWorld : "helloworld"
-
-   # smartdns源码
-  REPO_URL_smartdns: https://github.com/pymumu/smartdns
-  REPO_BRANCH_smartdns: master
-  REPO_PATH_smartdns : "smartdns"
 
 on:
   workflow_dispatch:
@@ -63,26 +29,26 @@ jobs:
     - name: 获取Commit Hash
       id: getHash
       run: |
-        git clone --depth 1 $REPO_URL_Lede -b $REPO_BRANCH_Lede $REPO_PATH_Lede
-        cd $REPO_PATH_Lede
-        echo "::set-output name=commitHash_Lede::$(git rev-parse HEAD)"
+        git clone --depth 1 https://github.com/coolsnowwolf/lede -b master lede
+        cd lede
+        echo "commitHash_Lede=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
         cd
-        git clone --depth 1 $REPO_URL_Lede_Package -b $REPO_BRANCH_Lede_Package $REPO_PATH_Lede_Package
-        cd $REPO_PATH_Lede_Package
-        echo "::set-output name=commitHash_Lede_Package::$(git rev-parse HEAD)"
+        
+        git clone --depth 1 https://github.com/coolsnowwolf/packages -b master ledepackage
+        cd ledepackage
+        echo "commitHash_Lede_Package=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
         cd
-        git clone --depth 1 $REPO_URL_Lede_Luci -b $REPO_BRANCH_Lede_Luci $REPO_PATH_Lede_Luci
-        cd $REPO_PATH_Lede_Luci
-        echo "::set-output name=commitHash_Lede_Luci::$(git rev-parse HEAD)"
+        
+        git clone --depth 1 https://github.com/coolsnowwolf/luci -b master luci
+        cd luci
+        echo "commitHash_Lede_Luci=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+        cd      
+         
+        git clone --depth 1 https://github.com/fw876/helloworld -b master helloworld 
+        cd helloworld
+        echo "commitHash_HelloWorld=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
         cd
-        git clone --depth 1 $REPO_URL_HelloWorld -b $REPO_BRANCH_HelloWorld $REPO_PATH_HelloWorld 
-        cd $REPO_PATH_HelloWorld
-        echo "::set-output name=commitHash_HelloWorld::$(git rev-parse HEAD)"
-        cd
-        git clone --depth 1 $REPO_URL_smartdns -b $REPO_BRANCH_smartdns $REPO_PATH_smartdns 
-        cd $REPO_PATH_smartdns
-        echo "::set-output name=commitHash_smartdns::$(git rev-parse HEAD)"
-        cd
+
  
     - name: 显示Commit Head and Combination Heads
       id: combHeader
@@ -91,13 +57,8 @@ jobs:
         echo "commitHash_Lede_Package: ${{ steps.getHash.outputs.commitHash_Lede_Package }}"
         echo "commitHash_Lede_Luci: ${{ steps.getHash.outputs.commitHash_Lede_Luci }}"
         echo "commitHash_HelloWorld: ${{ steps.getHash.outputs.commitHash_HelloWorld }}"
-        echo "commitHash_smartdns: ${{ steps.getHash.outputs.commitHash_smartdns }}"
-        echo "::set-output name=commitHash_All::\
-          ${{steps.getHash.outputs.commitHash_Lede}}\
-          ${{steps.getHash.outputs.commitHash_Lede_Package}}\
-          ${{steps.getHash.outputs.commitHash_Lede_Luci}}\
-          ${{steps.getHash.outputs.commitHash_HelloWorld}}\
-          ${{steps.getHash.outputs.commitHash_smartdns}}"
+        echo "commitHash_All=${{steps.getHash.outputs.commitHash_Lede}}\${{steps.getHash.outputs.commitHash_Lede_Package}}\${{steps.getHash.outputs.commitHash_Lede_Luci}}\${{steps.getHash.outputs.commitHash_HelloWorld}}" >> $GITHUB_OUTPUT
+
           
     - name: 对比Commit Hash
       id: cacheHash
@@ -114,7 +75,6 @@ jobs:
         echo ${{ steps.getHash.outputs.commitHash_Lede_Package }} | tee .commitHash_Lede_Package
         echo ${{ steps.getHash.outputs.commitHash_Lede_Luci }} | tee .commitHash_Lede_Luci
         echo ${{ steps.getHash.outputs.commitHash_HelloWorld }} | tee .commitHash_HelloWorld
-        echo ${{ steps.getHash.outputs.commitHash_smartdns }} | tee .commitHash_smartdns
         echo ${{ steps.combHeader.outputs.commitHash_All }} | tee .commitHash_All
         echo "DATE22=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
 
