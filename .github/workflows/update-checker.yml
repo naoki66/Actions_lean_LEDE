@@ -11,9 +11,6 @@
 
 name: 更新检查
 
-env:
-
-
 on:
   workflow_dispatch:
   schedule:
