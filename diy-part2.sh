@@ -37,7 +37,7 @@ git clone --depth 1 https://github.com/pymumu/smartdns package/applications/smar
 #sed -i 's/echo $h/echo $g/g' package/lean/autocore/files/x86/autocore
 
 
-#升级smartdns版本到最新2022/11/17
-sed -i 's/1.2022.38/2022.11.11/g' feeds/packages/net/smartdns/Makefile
-sed -i 's/1991a0b102e891f149647b162897bf4403f8f66c/324aa2d77d3a39f74c8f32140d5bfc77337311e0/g' feeds/packages/net/smartdns/Makefile
+#升级smartdns版本到最新2022/11/21
+sed -i 's/1.2022.38/2022.11.21/g' feeds/packages/net/smartdns/Makefile
+sed -i 's/1991a0b102e891f149647b162897bf4403f8f66c/b9429e04d2be2fdd8a096fcf92c65606bea7395c/g' feeds/packages/net/smartdns/Makefile
 sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
