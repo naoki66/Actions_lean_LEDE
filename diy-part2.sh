@@ -28,13 +28,21 @@ sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' package/lean/default-settings/files/zzz
 
 #添加额外软件包
 git clone -b lede https://github.com/pymumu/luci-app-smartdns.git package/applications/luci-app-smartdns
-#git clone https://github.com/shidahuilang/luci-app-autoupdate.git package/applications/luci-app-autoupdate
 git clone --depth 1 https://github.com/pymumu/smartdns package/applications/smartdns
 
-# 恢复主机型号
-#sed -i 's/(dmesg | grep .*/{a}${b}${c}${d}${e}${f}/g' package/lean/autocore/files/x86/autocore
-#sed -i '/h=${g}.*/d' package/lean/autocore/files/x86/autocore
-#sed -i 's/echo $h/echo $g/g' package/lean/autocore/files/x86/autocore
+#添加passwall
+git clone https://github.com/xiaorouji/openwrt-passwall.git -b packages ./package/applications/passwall_package
+git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci ./package/applications/passwall
+cp -rf ./package/applications/passwall_package/* ./package/applications/passwall
+rm -rf ./package/applications/passwall_package
+
+#恢复主机型号
+sed -i 's/(dmesg | grep .*/{a}${b}${c}${d}${e}${f}/g' package/lean/autocore/files/x86/autocore
+sed -i '/h=${g}.*/d' package/lean/autocore/files/x86/autocore
+sed -i 's/echo $h/echo $g/g' package/lean/autocore/files/x86/autocore
+
+# 添加新主题
+if [ ! -d "./package/lean/luci-app-argon-config" ]; then git clone https://github.com/jerrykuku/luci-app-argon-config.git ./package/lean/luci-app-argon-config;   else cd ./package/lean/luci-app-argon-config; git stash; git stash drop; git pull; cd ..; cd ..; cd ..; fi;
 
 
 #升级smartdns版本到最新2022/11/21
