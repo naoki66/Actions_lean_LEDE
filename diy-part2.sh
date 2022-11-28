@@ -46,7 +46,7 @@ sed -i 's/echo $h/echo $g/g' package/lean/autocore/files/x86/autocore
 #if [ ! -d "./package/lean/luci-app-argon-config" ]; then git clone https://github.com/jerrykuku/luci-app-argon-config.git ./package/lean/luci-app-argon-config;   else cd ./package/lean/luci-app-argon-config; git stash; git stash drop; git pull; cd ..; cd ..; cd ..; fi;
 
 
-#升级smartdns版本到最新2022/11/21
+#升级smartdns版本到最新2022/11/24
 sed -i 's/1.2022.38/2022.11.21/g' feeds/packages/net/smartdns/Makefile
-sed -i 's/1991a0b102e891f149647b162897bf4403f8f66c/b9429e04d2be2fdd8a096fcf92c65606bea7395c/g' feeds/packages/net/smartdns/Makefile
+sed -i 's/1991a0b102e891f149647b162897bf4403f8f66c/bd31cc0a36159a64d5d79646db6c2a48655ba6e4/g' feeds/packages/net/smartdns/Makefile
 sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
