@@ -47,6 +47,6 @@ sed -i 's/echo $h/echo $g/g' package/lean/autocore/files/x86/autocore
 
 
 #升级smartdns版本到最新2022/11/24
-sed -i 's/1.2022.38/2022.11.21/g' feeds/packages/net/smartdns/Makefile
-sed -i 's/1991a0b102e891f149647b162897bf4403f8f66c/bd31cc0a36159a64d5d79646db6c2a48655ba6e4/g' feeds/packages/net/smartdns/Makefile
+sed -i 's/1.2022.38/2022.12.02/g' feeds/packages/net/smartdns/Makefile
+sed -i 's/1991a0b102e891f149647b162897bf4403f8f66c/410047822d3afd054311124128509bca1d712116/g' feeds/packages/net/smartdns/Makefile
 sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
