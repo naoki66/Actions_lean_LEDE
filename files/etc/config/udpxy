@@ -1,0 +1,15 @@
+
+config udpxy
+	option respawn '1'
+	option status '1'
+	option port '4022'
+	option disabled '0'
+	option verbose '1'
+	option source 'pppoe-wan'
+	option max_clients '5'
+	option bind 'br-lan'
+  option log_file '/var/log/udpxy'
+  option buffer_size '2097152'
+  option buffer_messages '10'
+  option mcsub_renew '300'
+
