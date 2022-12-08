@@ -37,9 +37,9 @@ cp -rf ./package/applications/passwall_package/* ./package/applications/passwall
 rm -rf ./package/applications/passwall_package
 
 #恢复主机型号
-sed -i 's/(dmesg | grep .*/{a}${b}${c}${d}${e}${f}/g' package/lean/autocore/files/x86/autocore
-sed -i '/h=${g}.*/d' package/lean/autocore/files/x86/autocore
-sed -i 's/echo $h/echo $g/g' package/lean/autocore/files/x86/autocore
+#sed -i 's/(dmesg | grep .*/{a}${b}${c}${d}${e}${f}/g' package/lean/autocore/files/x86/autocore
+#sed -i '/h=${g}.*/d' package/lean/autocore/files/x86/autocore
+#sed -i 's/echo $h/echo $g/g' package/lean/autocore/files/x86/autocore
 
 # 添加新主题
 #git clone https://github.com/jerrykuku/luci-app-argon-config.git ./package/applications/luci-app-argon-config
