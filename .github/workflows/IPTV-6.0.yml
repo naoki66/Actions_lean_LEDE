@@ -144,7 +144,7 @@ jobs:
       id: tag
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-IPTV-K5.15"
+        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-IPTV-K6.0"
         touch release.txt
         echo "::set-output name=status::success"
         echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
