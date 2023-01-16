@@ -8,7 +8,7 @@
 # Description: Build OpenWrt using GitHub Actions
 #
 
-name: LEDEX64K5.15
+name: LEDEX64K5.4
 
 on:
   repository_dispatch:
@@ -93,6 +93,7 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
         sed -i 's/OpenWrt/Build${{ env.DATE1 }} @ OpenWrt/g' package/lean/default-settings/files/zzz-default-settings
+        sed -i 's/KERNEL_PATCHVER:=6.1/KERNEL_PATCHVER:=5.4/g' target/linux/x86/Makefile
 
     - name: 下载软件包
       id: package
@@ -146,7 +147,7 @@ jobs:
       id: tag
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-K5.15"
+        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-K5.4"
         touch release.txt
         echo " Lean Openwrt K5.15源码更新记录:" >> release.txt
         git -C openwrt log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
@@ -190,5 +191,5 @@ jobs:
     - name: Pushplus推送通知
       if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
-        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"GitAction编译X64K5.15成功！","content":" 从${{ env.DATE }}开始到${{ env.DATE2 }}编译完成！","token":"${{ secrets.PUSHPLUS_TOKEN }}","webhook":"02","channel":"cp"}'
+        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"GitAction编译X64K5.4成功！","content":" 从${{ env.DATE }}开始到${{ env.DATE2 }}编译完成！","token":"${{ secrets.PUSHPLUS_TOKEN }}","webhook":"02","channel":"cp"}'
 
