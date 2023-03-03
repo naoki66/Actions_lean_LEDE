@@ -47,6 +47,6 @@ rm -rf ./package/applications/passwall_package
 
 
 #升级smartdns版本到最新2022/11/24
-sed -i 's/1.2022.38/2023.03.01/g' feeds/packages/net/smartdns/Makefile
-sed -i 's/1991a0b102e891f149647b162897bf4403f8f66c/95f843dc43415be3927822211ababf8afc87770f/g' feeds/packages/net/smartdns/Makefile
+sed -i 's/1.2022.38/2023.03.04/g' feeds/packages/net/smartdns/Makefile
+sed -i 's/1991a0b102e891f149647b162897bf4403f8f66c/e89778809897329f48c662b5cb9d69ed9df6c032/g' feeds/packages/net/smartdns/Makefile
 sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
