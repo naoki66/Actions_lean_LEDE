@@ -15,7 +15,7 @@
 
 # Add a feed source 添加额外软件包
 echo 'src-git helloworld https://github.com/fw876/helloworld' >>feeds.conf.default
-echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.conf.default
+#echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.conf.default
 echo 'src-git netspeedtest https://github.com/sirpdboy/netspeedtest' >>feeds.conf.default
 echo 'src-git ddnsgo https://github.com/sirpdboy/luci-app-ddns-go.git' >> feeds.conf.default
 
