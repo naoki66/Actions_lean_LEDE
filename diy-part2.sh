@@ -32,8 +32,8 @@ git clone --depth 1 https://github.com/pymumu/smartdns package/applications/smar
 
 #添加passwall
 git clone https://github.com/xiaorouji/openwrt-passwall.git -b packages ./package/applications/passwall_package
-#git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci ./package/applications/passwall
-git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci-smartdns-new-version ./package/applications/passwall
+git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci ./package/applications/passwall
+#git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci-smartdns-new-version ./package/applications/passwall
 cp -rf ./package/applications/passwall_package/* ./package/applications/passwall
 rm -rf ./package/applications/passwall_package
 
@@ -48,9 +48,9 @@ rm -rf ./package/applications/passwall_package
 
 
 #升级smartdns版本到最新2023
-#sed -i 's/1.2022.38/2023.03.08/g' feeds/packages/net/smartdns/Makefile
-#sed -i 's/1991a0b102e891f149647b162897bf4403f8f66c/9a43f0859d6f75bad979f116b48723a50453ad09/g' feeds/packages/net/smartdns/Makefile
-#sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
+#sed -i 's/1.2023.41/2023.03.08/g' feeds/packages/net/smartdns/Makefile
+sed -i 's/60a3719ec739be2cc1e11724ac049b09a75059cb/1ac2b2ad98bef602bc7f4631ae3f84cb448fa4ee/g' feeds/packages/net/smartdns/Makefile
+sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
 
 
 #修复mosdns到V4版本
