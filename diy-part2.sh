@@ -47,7 +47,13 @@ rm -rf ./package/applications/passwall_package
 #if [ ! -d "./package/lean/luci-app-argon-config" ]; then git clone https://github.com/jerrykuku/luci-app-argon-config.git ./package/lean/luci-app-argon-config;   else cd ./package/lean/luci-app-argon-config; git stash; git stash drop; git pull; cd ..; cd ..; cd ..; fi;
 
 
-#升级smartdns版本到最新2022/11/24
-sed -i 's/1.2022.38/2023.03.08/g' feeds/packages/net/smartdns/Makefile
-sed -i 's/1991a0b102e891f149647b162897bf4403f8f66c/9a43f0859d6f75bad979f116b48723a50453ad09/g' feeds/packages/net/smartdns/Makefile
-sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
+#升级smartdns版本到最新2023
+#sed -i 's/1.2022.38/2023.03.08/g' feeds/packages/net/smartdns/Makefile
+#sed -i 's/1991a0b102e891f149647b162897bf4403f8f66c/9a43f0859d6f75bad979f116b48723a50453ad09/g' feeds/packages/net/smartdns/Makefile
+#sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
+
+
+#修复mosdns到V4版本
+sed -i 's/5.1.2/4.5.3/g' feeds/packages/net/mosdns/Makefile
+sed -i 's/cc24a30f014fa563ca2065d198fcb0bdfe2949488f1944498f815a2a73969572/2a13b1b1d862731cf946a8ceaa99523a0eb0eaae56045dd31207b61a5a6d47ae/g' feeds/packages/net/mosdns/Makefile
+
