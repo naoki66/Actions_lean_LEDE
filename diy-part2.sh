@@ -26,7 +26,7 @@ sed -i 's/os.date(/&"%Y-%m-%d %H:%M:%S"/' package/lean/autocore/files/x86/index.
 sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' package/lean/default-settings/files/zzz-default-settings
 
 
-#添加额外软件包
+#添加luci-app-smartdns
 git clone -b lede https://github.com/pymumu/luci-app-smartdns.git package/applications/luci-app-smartdns
 git clone --depth 1 https://github.com/pymumu/smartdns package/applications/smartdns
 
@@ -61,7 +61,9 @@ sed -i 's/cc24a30f014fa563ca2065d198fcb0bdfe2949488f1944498f815a2a73969572/2a13b
 sed -i 's/^#LUCI_DEPENDS/LUCI_DEPENDS/g' feeds/lucky/luci-app-lucky/Makefile
 
 #干掉跑分程序
- sed -i 's, <%=luci.sys.exec("cat /etc/bench.log") or " "%><,<,g'  package/lean/autocore/files/x86/index.htm
+sed -i 's, <%=luci.sys.exec("cat /etc/bench.log") or " "%><,<,g'  package/lean/autocore/files/x86/index.htm
 rm -rf ./feeds/packages/utils/coremark
+
+
 
 
