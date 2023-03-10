@@ -57,3 +57,6 @@ sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
 sed -i 's/5.1.2/4.5.3/g' feeds/packages/net/mosdns/Makefile
 sed -i 's/cc24a30f014fa563ca2065d198fcb0bdfe2949488f1944498f815a2a73969572/2a13b1b1d862731cf946a8ceaa99523a0eb0eaae56045dd31207b61a5a6d47ae/g' feeds/packages/net/mosdns/Makefile
 
+#修复luci-app-lucky引用
+sed -i 's/^#LUCI_DEPENDS/LUCI_DEPENDS/g' feeds/lucky/luci-app-lucky/Makefile
+
