@@ -60,3 +60,8 @@ sed -i 's/cc24a30f014fa563ca2065d198fcb0bdfe2949488f1944498f815a2a73969572/2a13b
 #修复luci-app-lucky引用
 sed -i 's/^#LUCI_DEPENDS/LUCI_DEPENDS/g' feeds/lucky/luci-app-lucky/Makefile
 
+#干掉跑分程序
+sed -i 's/<%=\s*luci\.sys\.exec\("cat \/etc\/bench\.log"\)\s*or\s*\(" "\)\s*%>//g'  package/lean/autocore/files/x86/index.htm
+rm -rf ./feeds/packages/utils/coremark
+
+
