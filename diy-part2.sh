@@ -31,11 +31,11 @@ git clone -b lede https://github.com/pymumu/luci-app-smartdns.git package/applic
 git clone --depth 1 https://github.com/pymumu/smartdns package/applications/smartdns
 
 #添加passwall
-git clone https://github.com/xiaorouji/openwrt-passwall.git -b packages ./package/applications/passwall_package
-git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci ./package/applications/passwall
+#git clone https://github.com/xiaorouji/openwrt-passwall.git -b packages ./package/applications/passwall_package
+#git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci ./package/applications/passwall
 #git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci-smartdns-new-version ./package/applications/passwall
-cp -rf ./package/applications/passwall_package/* ./package/applications/passwall
-rm -rf ./package/applications/passwall_package
+#cp -rf ./package/applications/passwall_package/* ./package/applications/passwall
+#rm -rf ./package/applications/passwall_package
 
 #恢复主机型号
 #sed -i 's/(dmesg | grep .*/{a}${b}${c}${d}${e}${f}/g' package/lean/autocore/files/x86/autocore
@@ -61,7 +61,7 @@ sed -i 's/cc24a30f014fa563ca2065d198fcb0bdfe2949488f1944498f815a2a73969572/2a13b
 sed -i 's/^#LUCI_DEPENDS/LUCI_DEPENDS/g' feeds/lucky/luci-app-lucky/Makefile
 
 #干掉跑分程序
-sed -i 's/<%=\s*luci\.sys\.exec\("cat \/etc\/bench\.log"\)\s*or\s*\(" "\)\s*%>//g'  package/lean/autocore/files/x86/index.htm
+ sed -i 's, <%=luci.sys.exec("cat /etc/bench.log") or " "%><,<,g'  package/lean/autocore/files/x86/index.htm
 rm -rf ./feeds/packages/utils/coremark
 
 
