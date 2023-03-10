@@ -20,5 +20,5 @@ echo 'src-git ddnsgo https://github.com/sirpdboy/luci-app-ddns-go.git' >> feeds.
 echo 'src-git lucky https://github.com/gdy666/luci-app-lucky.git' >> feeds.conf.default
 echo 'src-git passwall_luci https://github.com/xiaorouji/openwrt-passwall.git;luci' >>feeds.conf.default
 echo 'src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall.git;packages' >>feeds.conf.default
-echo 'src-git luci_app_smartdns https://github.com/pymumu/luci-app-smartdns.git;lede' >>feeds.conf.default
+#echo 'src-git smartdns_luci https://github.com/pymumu/luci-app-smartdns.git;lede' >>feeds.conf.default
 
