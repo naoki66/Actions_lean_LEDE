@@ -47,8 +47,7 @@ git clone --depth 1 https://github.com/pymumu/smartdns package/applications/smar
 #if [ ! -d "./package/lean/luci-app-argon-config" ]; then git clone https://github.com/jerrykuku/luci-app-argon-config.git ./package/lean/luci-app-argon-config;   else cd ./package/lean/luci-app-argon-config; git stash; git stash drop; git pull; cd ..; cd ..; cd ..; fi;
 
 
-#升级smartdns版本到最新
-name=
+#升级smartdns版本到最新commits
 sed -i 's/1.2023.41/'"$(date +"%Y%m%d")"'/g' feeds/packages/net/smartdns/Makefile
 sed -i '/PKG_SOURCE_VERSION:=/d' feeds/packages/net/smartdns/Makefile
 sed -i "/smartdns.git/a\PKG_SOURCE_VERSION:=$(curl -s https://api.github.com/repos/pymumu/smartdns/commits | grep '"sha"' | head -1 | cut -d '"' -f 4)" feeds/packages/net/smartdns/Makefile
