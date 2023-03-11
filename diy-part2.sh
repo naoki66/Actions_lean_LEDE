@@ -47,15 +47,18 @@ git clone --depth 1 https://github.com/pymumu/smartdns package/applications/smar
 #if [ ! -d "./package/lean/luci-app-argon-config" ]; then git clone https://github.com/jerrykuku/luci-app-argon-config.git ./package/lean/luci-app-argon-config;   else cd ./package/lean/luci-app-argon-config; git stash; git stash drop; git pull; cd ..; cd ..; cd ..; fi;
 
 
-#升级smartdns版本到最新2023
-#sed -i 's/1.2023.41/2023.03.08/g' feeds/packages/net/smartdns/Makefile
-sed -i 's/60a3719ec739be2cc1e11724ac049b09a75059cb/1ac2b2ad98bef602bc7f4631ae3f84cb448fa4ee/g' feeds/packages/net/smartdns/Makefile
+#升级smartdns版本到最新
+name=
+sed -i 's/1.2023.41/'"$(date +"%Y%m%d")"'/g' feeds/packages/net/smartdns/Makefile
+sed -i '/PKG_SOURCE_VERSION:=/d' feeds/packages/net/smartdns/Makefile
+sed -i "/smartdns.git/a\PKG_SOURCE_VERSION:=$(curl -s https://api.github.com/repos/pymumu/smartdns/commits | grep '"sha"' | head -1 | cut -d '"' -f 4)" feeds/packages/net/smartdns/Makefile
+#sed -i 's/60a3719ec739be2cc1e11724ac049b09a75059cb/60a3719ec739be2cc1e11724ac049b09a75059cb/g' feeds/packages/net/smartdns/Makefile
 sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
 
 
 #修复mosdns到V4版本
-sed -i 's/5.1.2/4.5.3/g' feeds/packages/net/mosdns/Makefile
-sed -i 's/cc24a30f014fa563ca2065d198fcb0bdfe2949488f1944498f815a2a73969572/2a13b1b1d862731cf946a8ceaa99523a0eb0eaae56045dd31207b61a5a6d47ae/g' feeds/packages/net/mosdns/Makefile
+#sed -i 's/5.1.2/4.5.3/g' feeds/packages/net/mosdns/Makefile
+#sed -i 's/cc24a30f014fa563ca2065d198fcb0bdfe2949488f1944498f815a2a73969572/2a13b1b1d862731cf946a8ceaa99523a0eb0eaae56045dd31207b61a5a6d47ae/g' feeds/packages/net/mosdns/Makefile
 
 #修复luci-app-lucky引用
 sed -i 's/^#LUCI_DEPENDS/LUCI_DEPENDS/g' feeds/lucky/luci-app-lucky/Makefile
