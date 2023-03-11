@@ -50,15 +50,15 @@ jobs:
         echo "commitHash_passwall=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
         cd
         
-        git clone --depth 1 https://github.com/pymumu/smartdns.git -b master smartdns 
-        cd smartdns
-        echo "commitHash_smartdns=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-        cd
+        #git clone --depth 1 https://github.com/pymumu/smartdns.git -b master smartdns 
+        #cd smartdns
+        #echo "commitHash_smartdns=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+        #cd
  
     - name: 整理Hash
       id: combHeader
       run: |
-        echo "commitHash_All=${{steps.getHash.outputs.commitHash_Lede}} ，${{steps.getHash.outputs.commitHash_Lede_Package}} ，${{steps.getHash.outputs.commitHash_Lede_Luci}} ，${{steps.getHash.outputs.commitHash_HelloWorld}}，${{steps.getHash.outputs.commitHash_passwall}}${{steps.getHash.outputs.commitHash_smartdns}}" >> $GITHUB_OUTPUT
+        echo "commitHash_All=${{steps.getHash.outputs.commitHash_Lede}} ，${{steps.getHash.outputs.commitHash_Lede_Package}} ，${{steps.getHash.outputs.commitHash_Lede_Luci}} ，${{steps.getHash.outputs.commitHash_HelloWorld}}，${{steps.getHash.outputs.commitHash_passwall}}" >> $GITHUB_OUTPUT
           
     - name: 对比Commit Hash
       id: cacheHash
