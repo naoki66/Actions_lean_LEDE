@@ -34,7 +34,7 @@ sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' package/lean/default-settings/files/zzz
 #cp -rf ./package/applications/passwall_package/* ./package/applications/passwall
 #rm -rf ./package/applications/passwall_package
 mkdir -p ./package/applications/passwall
-cp -rf ./feeds/smartdns_luci/* ./package/applications/passwall
+cp -rf ./feeds/passwall_luci/* ./package/applications/passwall
 cp -rf ./feeds/passwall_packages/* ./package/applications/passwall
 
 #恢复主机型号
