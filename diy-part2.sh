@@ -71,6 +71,7 @@ sed -i 's/^#LUCI_DEPENDS/LUCI_DEPENDS/g' feeds/lucky/luci-app-lucky/Makefile
 sed -i 's, <%=luci.sys.exec("cat /etc/bench.log") or " "%><,<,g'  package/lean/autocore/files/x86/index.htm
 rm -rf ./feeds/packages/utils/coremark
 
-
+##干掉wan6和ula_prefix
+sed -i "/uci commit fstab/a\uci delete network.wan6\nuci delete network.globals.ula_prefix\nuci delete dhcp.lan.dhcpv6\nuci commit network" package/lean/default-settings/files/zzz-default-settings
 
 
