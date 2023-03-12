@@ -33,6 +33,7 @@ sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' package/lean/default-settings/files/zzz
 #git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci-smartdns-new-version ./package/applications/passwall
 #cp -rf ./package/applications/passwall_package/* ./package/applications/passwall
 #rm -rf ./package/applications/passwall_package
+mkdir ./package/applications/passwall
 cp -rf ./feeds/smartdns_luci/* ./package/applications/passwall
 cp -rf ./feeds/passwall_packages/* ./package/applications/passwall
 
@@ -54,6 +55,8 @@ sed -i "/smartdns.git/a\PKG_SOURCE_VERSION:=$(curl -s https://api.github.com/rep
 sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
 #git clone -b lede https://github.com/pymumu/luci-app-smartdns.git package/applications/luci-app-smartdns
 #git clone --depth 1 https://github.com/pymumu/smartdns package/applications/smartdns
+mkdir ./package/applications/smartdns_luci
+mkdir ./package/applications/smartdns
 cp -rf ./feeds/smartdns_luci/* ./package/applications/smartdns_luci
 cp -rf ./feeds/smartdns/* ./package/applications/smartdns
 
