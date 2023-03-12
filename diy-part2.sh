@@ -28,14 +28,13 @@ sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' package/lean/default-settings/files/zzz
 
 
 #添加passwall
-#git clone https://github.com/xiaorouji/openwrt-passwall.git -b packages ./package/applications/passwall_package
-#git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci ./package/applications/passwall
-#git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci-smartdns-new-version ./package/applications/passwall
-#cp -rf ./package/applications/passwall_package/* ./package/applications/passwall
-#rm -rf ./package/applications/passwall_package
-mkdir -p ./package/applications/passwall
-cp -rf ./feeds/passwall_luci/* ./package/applications/passwall
-cp -rf ./feeds/passwall_packages/* ./package/applications/passwall
+git clone https://github.com/xiaorouji/openwrt-passwall.git -b packages ./package/applications/passwall_package
+git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci ./package/applications/passwall
+cp -rf ./package/applications/passwall_package/* ./package/applications/passwall
+rm -rf ./package/applications/passwall_package
+#mkdir -p ./package/applications/passwall
+#cp -rf ./feeds/passwall_luci/* ./package/applications/passwall
+#cp -rf ./feeds/passwall_packages/* ./package/applications/passwall
 
 #恢复主机型号
 #sed -i 's/(dmesg | grep .*/{a}${b}${c}${d}${e}${f}/g' package/lean/autocore/files/x86/autocore
@@ -53,12 +52,12 @@ sed -i '/PKG_SOURCE_VERSION:=/d' feeds/packages/net/smartdns/Makefile
 sed -i "/smartdns.git/a\PKG_SOURCE_VERSION:=$(curl -s https://api.github.com/repos/pymumu/smartdns/commits | grep '"sha"' | head -1 | cut -d '"' -f 4)" feeds/packages/net/smartdns/Makefile
 #sed -i 's/60a3719ec739be2cc1e11724ac049b09a75059cb/60a3719ec739be2cc1e11724ac049b09a75059cb/g' feeds/packages/net/smartdns/Makefile
 sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
-#git clone -b lede https://github.com/pymumu/luci-app-smartdns.git package/applications/luci-app-smartdns
-#git clone --depth 1 https://github.com/pymumu/smartdns package/applications/smartdns
-mkdir -p ./package/applications/smartdns_luci
-mkdir -p ./package/applications/smartdns
-cp -rf ./feeds/smartdns_luci/* ./package/applications/smartdns_luci
-cp -rf ./feeds/smartdns/* ./package/applications/smartdns
+git clone -b lede https://github.com/pymumu/luci-app-smartdns.git package/applications/luci-app-smartdns
+git clone --depth 1 https://github.com/pymumu/smartdns package/applications/smartdns
+#mkdir -p ./package/applications/smartdns_luci
+#mkdir -p ./package/applications/smartdns
+#cp -rf ./feeds/smartdns_luci/* ./package/applications/smartdns_luci
+#cp -rf ./feeds/smartdns/* ./package/applications/smartdns
 
 #修复mosdns到V4版本
 #sed -i 's/5.1.2/4.5.3/g' feeds/packages/net/mosdns/Makefile
