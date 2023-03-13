@@ -148,14 +148,18 @@ jobs:
       run: |
         echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-K5.15"
         touch release.txt
-        echo " Lean Openwrt K5.15源码更新记录:" >> release.txt
+        echo " Lean<a href="https://github.com/coolsnowwolf/lede">lede</a> K5.15 更新记录:" >> release.txt
         git -C openwrt log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
-        echo " <br/>Lean Package 源码更新记录:" >> release.txt
+        echo " <br/><br/><a href="https://github.com/coolsnowwolf/packages">packages</a>更新记录:" >> release.txt
         git -C openwrt/feeds/packages log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
-        echo " <br/>Lean Luci 源码更新记录:" >> release.txt
+        echo " <br/><br/><a href="https://github.com/coolsnowwolf/luci">luci</a>更新记录:" >> release.txt
         git -C openwrt/feeds/luci log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
-        echo " <br/>SSRP 源码更新记录:" >> release.txt
+        echo " <br/><br/><a href="https://github.com/fw876/helloworld">helloworld</a> 更新记录:" >> release.txt
         git -C openwrt/feeds/helloworld log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H " >> release.txt
+        echo " <br/><br/><a href="https://github.com/xiaorouji/openwrt-passwall">passwall</a>  更新记录:" >> release.txt
+        git -C openwrt/feeds/passwall_packages log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H " >> release.txt
+        echo " <br/><br/><a href="https://github.com/pymumu/smartdns">smartdns</a> 更新记录:" >> release.txt
+        git -C openwrt/feeds/smartdns log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H " >> release.txt
         echo "::set-output name=status::success"
         echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
        
