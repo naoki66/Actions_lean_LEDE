@@ -29,7 +29,8 @@ sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' package/lean/default-settings/files/zzz
 
 #添加passwall
 git clone https://github.com/xiaorouji/openwrt-passwall.git -b packages ./package/applications/passwall_package
-git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci ./package/applications/passwall
+#git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci ./package/applications/passwall
+git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci-smartdns-new-version ./package/applications/passwall
 cp -rf ./package/applications/passwall_package/* ./package/applications/passwall
 rm -rf ./package/applications/passwall_package
 #mkdir -p ./package/applications/passwall
