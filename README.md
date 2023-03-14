@@ -9,6 +9,33 @@
    ➦smartdns源码来自 https://github.com/pymumu/smartdns</br>
    ➦lucky源码来自 https://github.com/gdy666/luci-app-lucky</br>
 
+
+
+
+首次编译：
+```bash
+git clone https://github.com/coolsnowwolf/lede
+cd lede
+./scripts/feeds update -a  && ./scripts/feeds install -a
+make menuconfig
+make download -j8
+make V=s -j1
+```
+
+二次编译：
+```bash
+cd lede 
+git pull  && ./scripts/feeds update -a  && ./scripts/feeds install -a 
+make defconfig && make download -j8
+make V=s -j$(nproc)
+```
+重新配置：
+```bash
+rm -rf ./tmp && rm -rf .config
+make menuconfig
+make V=s -j$(nproc)
+```
+
 ## 使用方法
 
 前面的自动编译以及个性化定制等修改，全部来源于P3TER大神的[代码](https://github.com/P3TERX/Actions-OpenWrt)及[教程](https://p3terx.com/archives/build-openwrt-with-github-actions.html)。</br>
