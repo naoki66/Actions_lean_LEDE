@@ -11,15 +11,15 @@
 name: IPTV-X64K6.1
 
 on:
-  repository_dispatch:
-  workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'SSH connection to Actions'
-        required: false
-        default: 'false'
-  #schedule:
-  # - cron: 30 21 * * *
+  #repository_dispatch:
+  #workflow_dispatch:
+  #  inputs:
+  #    ssh:
+  #      description: 'SSH connection to Actions'
+  #      required: false
+  #      default: 'false'
+  schedule:
+   - cron: 30 21 15 * *
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
