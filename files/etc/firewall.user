@@ -1,0 +1,22 @@
+# This file is interpreted as shell script.
+# Put your custom iptables rules here, they will
+# be executed with each firewall (re-)start.
+
+# Internal uci firewall chains are flushed and recreated on reload, so
+# put custom rules into the root chains e.g. INPUT or FORWARD or into the
+# special user chains, e.g. input_wan_rule or postrouting_lan_rule.
+iptables -t nat -A PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 53
+iptables -t nat -A PREROUTING -p tcp --dport 53 -j REDIRECT --to-ports 53
+[ -n "$(command -v ip6tables)" ] && ip6tables -t nat -A PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 53
+[ -n "$(command -v ip6tables)" ] && ip6tables -t nat -A PREROUTING -p tcp --dport 53 -j REDIRECT --to-ports 53
+#ip6tables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+#iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+#IPV6 and IPV4 MSS (maximum segment size) Clamping 
+#Ethernet default MTU 1500，PPPoE have 8bytes,so PPPoE MTU is 1500-8=1492, IPv4 Header（ 20 bytes）and TCP Header （ 20 bytes），
+# so IPv4 MSS is 1492-20-20= 1452 .IPv6 Header（ 40 bytes）and TCP Header （ 20 bytes），so IPv6 MSS is 1492-40-20= 1432 .
+#auto MSS Clamping 
+iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o pppoe-wan -j TCPMSS --clamp-mss-to-pmtu
+ip6tables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o pppoe-wan -j TCPMSS --clamp-mss-to-pmtu
+#set MSS Clamping 
+#$ iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o pppoe-wan -j TCPMSS --set-mss 1452
+#$ ip6tables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o pppoe-wan -j TCPMSS --set-mss 1432
