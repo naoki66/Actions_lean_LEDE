@@ -5,10 +5,10 @@
    ➦luci源码来自 https://github.com/coolsnowwolf/luci</br>
    ➦helloworld源码来自 https://github.com/fw876/helloworld</br>
    ➦passwall源码来自 https://github.com/xiaorouji/openwrt-passwall</br>
-   ➦ddns源码来自 https://github.com/sirpdboy/luci-app-ddns-go</br>
+   ➦ddns源码来自 https://github.com/sirpdboy/luci-app-ddns-go</br> 
+   ➦ddns源码 https://github.com/jeessy2/ddns-go</br> 
    ➦smartdns源码来自 https://github.com/pymumu/smartdns</br>
    ➦lucky源码来自 https://github.com/gdy666/luci-app-lucky</br>
-
 
 
 
