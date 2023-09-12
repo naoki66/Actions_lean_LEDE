@@ -288,3 +288,10 @@ config server
 	option server_group 'US'
 	option blacklist_ip '0'
 
+config server
+	option enabled '1'
+	option name 'dot.sb'
+	option ip 'dot.sb'
+	option port '853'
+	option type 'tls'
+	option server_group 'US'
