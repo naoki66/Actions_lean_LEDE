@@ -55,10 +55,10 @@ sed -i "/smartdns.git/a\PKG_SOURCE_VERSION:=$(curl -s https://api.github.com/rep
 sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
 git clone -b lede https://github.com/pymumu/luci-app-smartdns.git package/applications/luci-app-smartdns
 git clone --depth 1 https://github.com/pymumu/smartdns package/applications/smartdns
-#mkdir -p ./package/applications/smartdns_luci
-#mkdir -p ./package/applications/smartdns
-#cp -rf ./feeds/smartdns_luci/* ./package/applications/smartdns_luci
-#cp -rf ./feeds/smartdns/* ./package/applications/smartdns
+mkdir -p ./package/applications/smartdns_luci
+mkdir -p ./package/applications/smartdns
+cp -rf ./feeds/smartdns_luci/* ./package/applications/smartdns_luci
+cp -rf ./feeds/smartdns/* ./package/applications/smartdns
 
 #修复mosdns到V4版本
 #sed -i 's/5.1.2/4.5.3/g' feeds/packages/net/mosdns/Makefile
