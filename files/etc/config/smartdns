@@ -100,11 +100,48 @@ config server
 	option type 'https'
 
 config server
+	option name 'dnspod'
+	option ip '1.12.12.12'
+	option type 'tls'
+	option server_group 'CN'
+	option enabled '1'
+
+config server
+	option name 'dnspod'
+	option ip '120.53.53.53'
+	option type 'tls'
+	option server_group 'CN'
+	option enabled '1'
+config server
+	option name 'DNSPod'
+	option server_group 'CN'
+	option ip 'https://120.53.53.53/dns-query'
+	option type 'https'
+	option enabled '1'
+
+config server
+	option name 'DNSPod'
+	option type 'https'
+	option server_group 'CN'
+	option ip 'https://120.53.53.53/dns-query'
+	option enabled '1'
+
+config server
 	option name 'Alibaba'
 	option server_group 'CN'
 	option enabled '1'
 	option ip 'https://dns.alidns.com/dns-query'
 	option type 'https'
+
+config server
+	option enabled '1'
+	option name 'Alidns'
+	option ip 'dns.alidns.com'
+	option type 'tls'
+	option server_group 'CN'
+
+
+
 config server
 	option name 'Alibabav6'
 	option ip '2400:3200::1'
@@ -160,29 +197,6 @@ config server
 	option ip '2409:8060:20ea:100::1'
 	option enabled '0'
 
-config server
-	option enabled '1'
-	option name 'GoogleDns2'
-	option ip '8.8.4.4'
-	option type 'tls'
-	option server_group 'US'
-	option exclude_default_group '1'
-
-config server
-	option enabled '1'
-	option name 'GoogleDns3'
-	option ip 'https://dns.google/dns-query'
-	option type 'https'
-	option server_group 'US'
-	option exclude_default_group '1'
-
-config server
-	option enabled '1'
-	option name 'OpenDNS'
-	option ip 'https://doh.opendns.com/dns-query'
-	option type 'https'
-	option server_group 'oversea'
-	option blacklist_ip '0'
 
 
 config server
@@ -227,4 +241,50 @@ config server
 	option ip 'dns.ipv6dns.com'
 	option type 'tls'
 
+
+config server
+	option enabled '1'
+	option name 'cloudflare'
+	option ip '1.1.1.1'
+	option type 'tls'
+	option server_group 'US'
+
+config server
+	option enabled '1'
+	option name 'CloudFlare'
+	option server_group 'US'
+	option ip 'https://1.1.1.1/dns-query'
+	option type 'https'
+	option exclude_default_group '1'
+
+config server
+	option enabled '1'
+	option name 'Cloudflare'
+	option ip '1.0.0.1'
+	option type 'tls'
+	option server_group 'US'
+
+config server
+	option enabled '1'
+	option name 'GoogleDns2'
+	option ip '8.8.4.4'
+	option type 'tls'
+	option server_group 'US'
+	option exclude_default_group '1'
+
+config server
+	option enabled '1'
+	option name 'GoogleDns3'
+	option ip 'https://dns.google/dns-query'
+	option type 'https'
+	option server_group 'US'
+	option exclude_default_group '1'
+
+config server
+	option enabled '1'
+	option name 'OpenDNS'
+	option ip 'https://doh.opendns.com/dns-query'
+	option type 'https'
+	option server_group 'US'
+	option blacklist_ip '0'
 
