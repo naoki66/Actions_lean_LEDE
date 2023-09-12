@@ -36,43 +36,20 @@ config smartdns
 
 config server
 	option enabled '1'
-	option name 'GoogleDns'
-	option ip '8.8.8.8'
-	option blacklist_ip '0'
-	option type 'tcp'
-	option server_group 'oversea'
-
-config server
-	option enabled '1'
-	option name 'GoogleDns2'
-	option ip '8.8.4.4'
-	option blacklist_ip '0'
-	option type 'tls'
-	option server_group 'oversea'
-
-config server
-	option enabled '1'
+	option name 'CQUNICOM'
+	option ip '221.7.92.98'
 	option type 'udp'
-	option name '114'
-	option ip '114.114.114.114'
-	option server_group 'cn'
-	option blacklist_ip '0'
+	option server_group 'CN'
+	option exclude_default_group '1'
 
 config server
-	option enabled '1'
+	option name 'CQUNICOM2'
+	option ip '221.5.203.98'
 	option type 'udp'
-	option name 'Tencent'
-	option ip '119.29.29.29'
-	option server_group 'cn'
+	option exclude_default_group '0'
 	option blacklist_ip '0'
-
-config server
-	option enabled '1'
-	option type 'udp'
-	option name 'Alibaba'
-	option ip '223.5.5.5'
-	option server_group 'cn'
-	option blacklist_ip '0'
+	option server_group 'CN'
+	option enabled '0'
 
 config server
 	option type 'udp'
@@ -90,21 +67,6 @@ config server
 	option blacklist_ip '0'
 	option enabled '0'
 
-config server
-	option enabled '1'
-	option type 'udp'
-	option name 'CQUNICOM'
-	option ip '221.7.92.98'
-	option server_group 'cn'
-	option blacklist_ip '0'
-
-config server
-	option type 'udp'
-	option name 'CQUNICOM2'
-	option ip '221.5.203.98'
-	option server_group 'cn'
-	option blacklist_ip '0'
-	option enabled '1'
 
 config server
 	option type 'udp'
@@ -123,50 +85,66 @@ config server
 	option enabled '0'
 
 config server
+	option server_group 'CN'
+	option exclude_default_group '1'
 	option enabled '1'
-	option ip 'https://dns.google/dns-query'
-	option type 'https'
-	option name 'GoogleDns3'
-	option server_group 'oversea'
-	option blacklist_ip '0'
-
-config server
-	option enabled '1'
-	option name 'OpenDNS'
-	option ip 'https://doh.opendns.com/dns-query'
-	option type 'https'
-	option server_group 'oversea'
-	option blacklist_ip '0'
-
-config server
-	option enabled '1'
-	option name 'OpenDNS1'
-	option ip '208.67.222.222'
-	option type 'tcp'
-	option server_group 'oversea'
-	option blacklist_ip '0'
-
-config server
-	option enabled '1'
-	option name 'OpenDNS2'
-	option ip '208.67.220.220'
+	option name 'DNSPod'
+	option ip 'dot.pub'
 	option type 'tls'
-	option server_group 'oversea'
+
+config server
+	option server_group 'CN'
+	option name 'DNSPod'
+	option enabled '1'
+	option ip 'https://doh.pub/dns-query'
+	option type 'https'
+
+config server
+	option name 'Alibaba'
+	option server_group 'CN'
+	option enabled '1'
+	option ip 'https://dns.alidns.com/dns-query'
+	option type 'https'
+config server
+	option name 'Alibabav6'
+	option ip '2400:3200::1'
+	option server_group 'CN'
+	option exclude_default_group '0'
 	option blacklist_ip '0'
+	option type 'tls'
+	option no_check_certificate '0'
+	option enabled '1'
 
 config server
+	option enabled '1'
+	option name 'CQUNICOMv6'
+	option ip '2408:8663::2'
 	option type 'udp'
-	option server_group 'cn'
-	option ip '2409:8060:20ea:200::1'
-	option name 'CQCMCCv61'
+	option server_group 'CN'
+	option exclude_default_group '1'
+
+config server
+	option name 'CQUNICOM2v6'
+	option ip '2408:8662::2'
+	option type 'udp'
+	option server_group 'CN'
+	option exclude_default_group '0'
+	option blacklist_ip '0'
 	option enabled '0'
 
 config server
 	option type 'udp'
 	option server_group 'cn'
-	option name 'CQCMCCv62'
-	option ip '2409:8060:20ea:100::1'
+	option name 'CQTELNETv6'
+	option ip '240e:47:0:701::1'
 	option enabled '0'
+
+config server
+	option type 'udp'
+	option enabled '0'
+	option server_group 'cn'
+	option name 'CQTELNETv62'
+	option ip '240E:47:0:702::1'
 
 config server
 	option enabled '1'
@@ -181,6 +159,31 @@ config server
 	option name 'CQUNICOM2v6'
 	option ip '2408:8662::2'
 	option enabled '1'
+
+config server
+	option enabled '1'
+	option name 'GoogleDns2'
+	option ip '8.8.4.4'
+	option type 'tls'
+	option server_group 'US'
+	option exclude_default_group '1'
+
+config server
+	option enabled '1'
+	option name 'GoogleDns3'
+	option ip 'https://dns.google/dns-query'
+	option type 'https'
+	option server_group 'US'
+	option exclude_default_group '1'
+
+config server
+	option enabled '1'
+	option name 'OpenDNS'
+	option ip 'https://doh.opendns.com/dns-query'
+	option type 'https'
+	option server_group 'oversea'
+	option blacklist_ip '0'
+
 
 config server
 	option enabled '1'
@@ -224,17 +227,4 @@ config server
 	option ip 'dns.ipv6dns.com'
 	option type 'tls'
 
-config server
-	option type 'udp'
-	option server_group 'cn'
-	option name 'CQTELNETv6'
-	option ip '240e:47:0:701::1'
-	option enabled '0'
-
-config server
-	option type 'udp'
-	option enabled '0'
-	option server_group 'cn'
-	option name 'CQTELNETv62'
-	option ip '240E:47:0:702::1'
 
