@@ -147,18 +147,18 @@ config server
 	option ip '240E:47:0:702::1'
 
 config server
-	option enabled '1'
 	option type 'udp'
 	option server_group 'cn'
-	option name ' CQUNICOMv6'
-	option ip '2408:8663::2'
+	option ip '2409:8060:20ea:200::1'
+	option name 'CQCMCCv61'
+	option enabled '0'
 
 config server
 	option type 'udp'
 	option server_group 'cn'
-	option name 'CQUNICOM2v6'
-	option ip '2408:8662::2'
-	option enabled '1'
+	option name 'CQCMCCv62'
+	option ip '2409:8060:20ea:100::1'
+	option enabled '0'
 
 config server
 	option enabled '1'
