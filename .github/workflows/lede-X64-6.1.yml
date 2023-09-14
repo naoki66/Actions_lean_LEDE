@@ -157,8 +157,8 @@ jobs:
         git -C openwrt/feeds/luci log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
         echo " <br/><br/><a href="https://github.com/fw876/helloworld">helloworld</a> 更新记录:" >> release.txt
         git -C openwrt/feeds/helloworld log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H " >> release.txt
-        echo " <br/><br/><a href="https://github.com/xiaorouji/openwrt-passwall">passwall</a>  更新记录:" >> release.txt
-        git -C openwrt/feeds/passwall_packages log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H " >> release.txt
+        #echo " <br/><br/><a href="https://github.com/xiaorouji/openwrt-passwall">passwall</a>  更新记录:" >> release.txt
+        #git -C openwrt/feeds/passwall_packages log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H " >> release.txt
         echo " <br/><br/><a href="https://github.com/pymumu/smartdns">smartdns</a> 更新记录:" >> release.txt
         git -C openwrt/feeds/smartdns log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H " >> release.txt
         echo "::set-output name=status::success"
