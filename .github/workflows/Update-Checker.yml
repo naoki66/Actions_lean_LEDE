@@ -1,4 +1,4 @@
-#
+        #
 # Copyright (c) 2019-2022 P3TERX <https://p3terx.com>
 #
 # This is free software, licensed under the MIT License.
@@ -45,10 +45,10 @@ jobs:
         echo "commitHash_HelloWorld=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
         cd
         
-        git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall.git -b packages passwall 
-        cd passwall
-        echo "commitHash_passwall=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-        cd
+        #git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall.git -b packages passwall 
+        #cd passwall
+        #echo "commitHash_passwall=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+        #cd
         
         #git clone --depth 1 https://github.com/pymumu/smartdns.git -b master smartdns 
         #cd smartdns
@@ -62,7 +62,7 @@ jobs:
     - name: 整理Hash
       id: combHeader
       run: |
-       echo "commitHash_All=${{steps.getHash.outputs.commitHash_Lede}} ，${{steps.getHash.outputs.commitHash_Lede_Package}} ，${{steps.getHash.outputs.commitHash_Lede_Luci}} ，${{steps.getHash.outputs.commitHash_HelloWorld}}，${{steps.getHash.outputs.commitHash_passwall}}" >> $GITHUB_OUTPUT          
+       echo "commitHash_All=${{steps.getHash.outputs.commitHash_Lede}} ，${{steps.getHash.outputs.commitHash_Lede_Package}} ，${{steps.getHash.outputs.commitHash_Lede_Luci}} ，${{steps.getHash.outputs.commitHash_HelloWorld}}" >> $GITHUB_OUTPUT          
     - name: 对比Commit Hash
       id: cacheHash
       uses: actions/cache@v3
@@ -92,4 +92,5 @@ jobs:
       with:
         token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
         event-type: 上游源码更新触发编译
+
 
