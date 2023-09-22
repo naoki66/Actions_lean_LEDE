@@ -45,20 +45,7 @@ jobs:
         echo "commitHash_HelloWorld=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
         cd
         
-        #git clone --depth 1 https://github.com/xiaorouji/openwrt-passwall.git -b packages passwall 
-        #cd passwall
-        #echo "commitHash_passwall=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-        #cd
-        
-        #git clone --depth 1 https://github.com/pymumu/smartdns.git -b master smartdns 
-        #cd smartdns
-        #echo "commitHash_smartdns=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-        #cd
-        
-        #git clone --depth 1 https://github.com/vernesong/OpenClash.git -b master OpenClash 
-        #cd OpenClash
-        #echo "commitHash_OpenClash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-        #cd
+
     - name: 整理Hash
       id: combHeader
       run: |
@@ -74,14 +61,10 @@ jobs:
     - name: 保存新的Commit Hash
       if: steps.cacheHash.outputs.cache-hit != 'true'
       run: |
-        #echo ${{ steps.getHash.outputs.commitHash_Lede }} | tee .commitHash_Lede
-        #echo ${{ steps.getHash.outputs.commitHash_Lede_Package }} | tee .commitHash_Lede_Package
-        #echo ${{ steps.getHash.outputs.commitHash_Lede_Luci }} | tee .commitHash_Lede_Luci
-        #echo ${{ steps.getHash.outputs.commitHash_HelloWorld }} | tee .commitHash_HelloWorld
         echo ${{ steps.combHeader.outputs.commitHash_All }} | tee .commitHash_All
 
     - name: 删除运行记录
-      uses: GitRML/delete-workflow-runs@main
+      uses: naoki66/delete-workflow-runs@main
       with:
         retain_days: 1
         keep_minimum_runs: 1
