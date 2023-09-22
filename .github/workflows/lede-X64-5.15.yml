@@ -153,7 +153,7 @@ jobs:
       id: tag
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-       echo "release_tag=$(date +"%Y.%m.%d-%H%M")-K5.15 >> $GITHUB_OUTPUT
+        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-K5.15 >> $GITHUB_OUTPUT
         touch release.txt
         echo " Lean<a href="https://github.com/coolsnowwolf/lede">lede</a> K5.15 更新记录:" >> release.txt
         git -C openwrt log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
@@ -161,12 +161,11 @@ jobs:
         git -C openwrt/feeds/packages log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
         echo " <br/><br/><a href="https://github.com/coolsnowwolf/luci">luci</a>更新记录:" >> release.txt
         git -C openwrt/feeds/luci log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
-        echo " <br/><br/><a href="https://github.com/fw876/helloworld">helloworld</a> 更新记录:" >> release.txt
         echo "status=success" >> $GITHUB_OUTPUT
-        echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
+        
        
     - name: 上传固件到release发布页
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@main
       if: steps.tag.outputs.status == 'success' && !cancelled()
       env:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}
@@ -196,4 +195,5 @@ jobs:
     - name: Pushplus推送通知
       if: steps.tag.outputs.status == 'success' && !cancelled()
       run: |
-        curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"GitAction编译X64K6.1成功！","content":" 从${{ env.DATE0 }}开始到${{ env.DATE2 }}编译完成！","token":"${{ secrets.PUSHPLUS_TOKEN }}","webhook":"02","channel":"cp"}'
+       echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
+       curl http://www.pushplus.plus/send -X POST -H "Content-Type:application/json" -d '{"title":"GitAction编译X64K6.1成功！","content":" 从${{ env.DATE0 }}开始到${{ env.DATE2 }}编译完成！","token":"${{ secrets.PUSHPLUS_TOKEN }}","webhook":"02","channel":"cp"}'
