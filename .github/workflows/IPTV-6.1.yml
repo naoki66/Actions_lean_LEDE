@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
+# Copyright (c) 2019-2023 P3TERX <https://p3terx.com>
 #
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
@@ -62,11 +62,19 @@ jobs:
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         
-    - name: 对比工具链缓存
+    - name: 对比编译工具环境缓存
       uses: klever1988/cachewrtbuild@main
       with:
-        ccache: 'true' 
+        #是否一并缓存.ccache目录，如果你启用了ccache。这是唯一的常用参数，其他三个用于除错，一般不需要调整
+        ccache: 'true'   
+        #是否缓存工具链目录 
+        toolchain: 'true' 
+        #是否跳过工具链编译
+        skip: 'true'
+        #清空缓存          
+        clean: 'false'
         prefix: ${{ github.workspace }}/openwrt    
+
 
     - name: 载入配置feeds
       run: |
@@ -79,7 +87,7 @@ jobs:
     - name: 安装feeds、更新日期
       run: |
        cd openwrt && ./scripts/feeds install -a
-       echo "DATE=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
+       echo "DATE0=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
        echo "DATE1=$(date "+%Y.%m.%d-%H:%M")" >> $GITHUB_ENV
 
     - name: 载入配置文件、修改固件日期
@@ -131,7 +139,7 @@ jobs:
         cd openwrt/bin/targets/*/*
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-        echo "::set-output name=status::success"
+        echo "status=success" >> $GITHUB_OUTPUT
 
     - name: 上传固件文件
       uses: actions/upload-artifact@main
@@ -144,9 +152,9 @@ jobs:
       id: tag
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")-IPTV-K6.1"
+        echo "release_tag=$(date +"%Y.%m.%d-%H%M")-IPTV-K6.1 >> $GITHUB_OUTPUT
         touch release.txt
-        echo "::set-output name=status::success"
+        echo "status=success" >> $GITHUB_OUTPUT
         echo "DATE2=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
        
     - name: 上传固件到release发布页
@@ -160,7 +168,7 @@ jobs:
         files: ${{ env.FIRMWARE }}/*        
       
     - name: 删除运行的工作流
-      uses: GitRML/delete-workflow-runs@main
+      uses: naoki66/delete-workflow-runs@main
       with:
         token: ${{ secrets.ACTIONS_TRIGGER_PAT  }}
         repository: ${{ github.repository }}
@@ -168,7 +176,7 @@ jobs:
         keep_minimum_runs: 3
 
     - name: 删除旧Releases
-      uses: dev-drprasad/delete-older-releases@v0.1.0
+      uses: dev-drprasad/delete-older-releases@v0.2.1
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
         keep_latest: 15
