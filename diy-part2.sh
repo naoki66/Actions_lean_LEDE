@@ -67,4 +67,3 @@ rm -rf ./feeds/packages/utils/coremark
 
 ##干掉wan6和ula_prefix
 sed -i "/uci commit fstab/a\uci delete network.wan6\nuci delete network.globals.ula_prefix\nuci set dhcp.lan.start=\'50\'\nuci set network.lan.ip6assign=\'64\'\nuci set network.globals.packet_steering=0\nuci commit network" package/lean/default-settings/files/zzz-default-settings
-
