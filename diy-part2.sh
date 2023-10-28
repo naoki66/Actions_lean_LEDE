@@ -26,7 +26,6 @@ sed -i 's/os.date(/&"%Y-%m-%d %H:%M:%S"/' package/lean/autocore/files/x86/index.
 sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' package/lean/default-settings/files/zzz-default-settings
 
 
-
 #添加passwall
 git clone https://github.com/xiaorouji/openwrt-passwall.git -b packages ./package/applications/passwall_package
 #git clone https://github.com/xiaorouji/openwrt-passwall.git -b luci ./package/applications/passwall
@@ -37,21 +36,11 @@ rm -rf ./package/applications/passwall_package
 #cp -rf ./feeds/passwall_luci/* ./package/applications/passwall
 #cp -rf ./feeds/passwall_packages/* ./package/applications/passwall
 
-#恢复主机型号
-#sed -i 's/(dmesg | grep .*/{a}${b}${c}${d}${e}${f}/g' package/lean/autocore/files/x86/autocore
-#sed -i '/h=${g}.*/d' package/lean/autocore/files/x86/autocore
-#sed -i 's/echo $h/echo $g/g' package/lean/autocore/files/x86/autocore
-
-# 添加新主题
-#git clone https://github.com/jerrykuku/luci-app-argon-config.git ./package/applications/luci-app-argon-config
-#if [ ! -d "./package/lean/luci-app-argon-config" ]; then git clone https://github.com/jerrykuku/luci-app-argon-config.git ./package/lean/luci-app-argon-config;   else cd ./package/lean/luci-app-argon-config; git stash; git stash drop; git pull; cd ..; cd ..; cd ..; fi;
-
 
 #升级smartdns版本到最新commits
 sed -i 's/1.2023.41/'"$(date +"%Y%m%d")"'/g' feeds/packages/net/smartdns/Makefile
 sed -i '/PKG_SOURCE_VERSION:=/d' feeds/packages/net/smartdns/Makefile
 sed -i "/smartdns.git/a\PKG_SOURCE_VERSION:=$(curl -s https://api.github.com/repos/pymumu/smartdns/commits | grep '"sha"' | head -1 | cut -d '"' -f 4)" feeds/packages/net/smartdns/Makefile
-#sed -i 's/60a3719ec739be2cc1e11724ac049b09a75059cb/60a3719ec739be2cc1e11724ac049b09a75059cb/g' feeds/packages/net/smartdns/Makefile
 sed -i 's/^PKG_MIRROR_HASH/#&/' feeds/packages/net/smartdns/Makefile
 git clone -b lede https://github.com/pymumu/luci-app-smartdns.git package/applications/luci-app-smartdns
 git clone --depth 1 https://github.com/pymumu/smartdns package/applications/smartdns
