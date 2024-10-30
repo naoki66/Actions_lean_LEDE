@@ -155,7 +155,7 @@ jobs:
         
        
     - name: 上传固件到release
-      uses: softprops/action-gh-release@main
+      uses: softprops/action-gh-release@master
       if: steps.tag.outputs.status == 'success' && !cancelled()
       env:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}
@@ -173,7 +173,7 @@ jobs:
         keep_minimum_runs: 3
 
     - name: 删除旧Releases
-      uses: dev-drprasad/delete-older-releases@main
+      uses: dev-drprasad/delete-older-releases@master
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
         keep_latest: 4
