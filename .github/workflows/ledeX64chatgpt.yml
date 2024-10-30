@@ -117,7 +117,7 @@ jobs:
         test -f openwrt/bin/targets/*/*/sha256sums || { echo "Error: sha256sums file not found."; exit 1; }
 
     - name: 上传bin文件夹
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@main
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
         name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
@@ -133,7 +133,7 @@ jobs:
         echo "status=success" >> $GITHUB_OUTPUT
         
     - name: 上传固件文件
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@main
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
@@ -155,7 +155,7 @@ jobs:
         
        
     - name: 上传固件到release
-      uses: softprops/action-gh-release@v3
+      uses: softprops/action-gh-release@main
       if: steps.tag.outputs.status == 'success' && !cancelled()
       env:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}
@@ -165,7 +165,7 @@ jobs:
         files: ${{ env.FIRMWARE }}/*        
       
     - name: 删除运行的工作流
-      uses: naoki66/delete-workflow-runs@v3
+      uses: naoki66/delete-workflow-runs@main
       with:
         token: ${{ secrets.ACTIONS_TRIGGER_PAT  }}
         repository: ${{ github.repository }}
@@ -173,7 +173,7 @@ jobs:
         keep_minimum_runs: 3
 
     - name: 删除旧Releases
-      uses: dev-drprasad/delete-older-releases@v3
+      uses: dev-drprasad/delete-older-releases@main
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
         keep_latest: 4
