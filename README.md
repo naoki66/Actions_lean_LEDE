@@ -1,14 +1,8 @@
 # Actions-OpenWrt  
-🚀 本仓库永久每天会编译出最新固件。跟踪上游源码变化，自动编译。</br>
+🚀 本仓库永久每7天会编译出最新固件。跟踪上游源码变化，自动编译。</br>
    ➦openwrt主源码来自https://github.com/coolsnowwolf/lede</br>
    ➦packages源码来自https://github.com/coolsnowwolf/packages</br>
    ➦luci源码来自 https://github.com/coolsnowwolf/luci</br>
-   ➦helloworld源码来自 https://github.com/fw876/helloworld</br>
-   ➦passwall源码来自 https://github.com/xiaorouji/openwrt-passwall</br>
-   ➦ddns源码来自 https://github.com/sirpdboy/luci-app-ddns-go</br> 
-   ➦ddns源码来自 https://github.com/jeessy2/ddns-go</br> 
-   ➦smartdns源码来自 https://github.com/pymumu/smartdns</br>
-   ➦lucky源码来自 https://github.com/gdy666/luci-app-lucky</br>
 
 
 
