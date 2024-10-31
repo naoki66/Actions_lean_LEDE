@@ -60,7 +60,7 @@ jobs:
       working-directory: /workdir
       run: |
         df -hT $PWD
-        echo "TIME0=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
+        echo "TIME0=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         
@@ -140,7 +140,7 @@ jobs:
         cd openwrt/bin/targets/*/*
         rm -rf packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-        echo "TIME1=$(date "+%Y年%m月%d日%H时%M分")" >> $GITHUB_ENV
+        echo "TIME1=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
         
     - name: 上传固件文件
