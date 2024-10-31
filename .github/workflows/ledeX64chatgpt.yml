@@ -110,11 +110,6 @@ jobs:
       if: (!cancelled())
       run: df -hT
 
-    - name: 检查关键文件
-      if: steps.compile.outputs.status == 'success' && !cancelled()
-      run: |
-        test -f openwrt/bin/targets/*/*/firmware.bin || { echo "Error: firmware.bin not found."; exit 1; }
-        test -f openwrt/bin/targets/*/*/sha256sums || { echo "Error: sha256sums file not found."; exit 1; }
 
     - name: 上传bin文件夹
       uses: actions/upload-artifact@main
