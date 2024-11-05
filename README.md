@@ -8,6 +8,7 @@
 
 首次编译：
 ```bash
+export GOPROXY=https://goproxy.cn
 git clone https://github.com/coolsnowwolf/lede
 cd lede
 ./scripts/feeds update -a  && ./scripts/feeds install -a
@@ -18,6 +19,7 @@ make V=s -j1
 
 二次编译：
 ```bash
+export GOPROXY=https://goproxy.cn
 cd lede 
 git pull  && ./scripts/feeds update -a  && ./scripts/feeds install -a 
 make defconfig && make download -j8
