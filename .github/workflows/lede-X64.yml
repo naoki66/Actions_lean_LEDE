@@ -1,3 +1,12 @@
+#
+# Copyright (c) 2019-2023 P3TERX <https://p3terx.com>
+#
+# This is free software, licensed under the MIT License.
+# See /LICENSE for more information.
+#
+# https://github.com/P3TERX/Actions-OpenWrt
+# Description: Build OpenWrt using GitHub Actions with disk space optimization
+
 name: LEDEX64
 
 on:
@@ -9,7 +18,7 @@ on:
         required: false
         default: 'false'
   schedule:
-   - cron: '40 16 */3 * *'  # 修复引号问题
+   - cron: 40 16 */3 * *
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -22,10 +31,9 @@ env:
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
-  # 新增环境变量：控制编译过程中的磁盘使用
   MAKEFLAGS: "-j$(nproc) V=s"  # 优化编译参数
-  CCACHE_DIR: ${{ github.workspace }}/.ccache  # ccache 目录
-  CCACHE_MAXSIZE: "500M"  # 限制 ccache 最大大小
+  CCACHE_DIR: ${{ github.workspace }}/.ccache  # ccache目录
+  CCACHE_MAXSIZE: "500M"  # 限制ccache最大大小
 
 jobs:
   build:
@@ -39,11 +47,11 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        # 优化磁盘清理，增加更多清理项
+        # 增强磁盘清理，释放更多根分区空间
         sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
                     /usr/lib/jvm /usr/share/swift /usr/local/go \
-                    /opt/hostedtoolcache/CodeQL
-        sudo docker system prune -af --volumes  # 清理所有未使用的容器和卷
+                    /opt/hostedtoolcache/* /usr/share/az_*
+        sudo docker system prune -af --volumes
         sudo -E apt-get -qq update
         sudo -E apt-get -qq install $(curl -fsSL https://github.com/naoki66/Actions_lean_LEDE/raw/main/depends-ubuntu)
         sudo -E apt-get -qq autoremove --purge
@@ -53,16 +61,16 @@ jobs:
         sudo chown $USER:$GROUPS /workdir
         df -h  # 显示磁盘使用情况
 
-    - name: 克隆源代码
-      working-directory: /workdir
+    - name: 克隆源代码到/mnt分区
+      working-directory: /mnt  # 关键修改：使用/mnt分区而非默认根分区
       run: |
         df -hT $PWD
         echo "TIME0=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         git clone $REPO_URL -b $REPO_BRANCH openwrt
-        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+        ln -sf /mnt/openwrt $GITHUB_WORKSPACE/openwrt  # 保持符号链接
         df -h  # 显示克隆后的磁盘使用情况
 
-    - name: 设置 ccache
+    - name: 设置ccache
       uses: hendrikmuhs/ccache-action@v1.2
       with:
         key: ${{ runner.os }}-openwrt
@@ -75,49 +83,52 @@ jobs:
         toolchain: 'true'
         skip: 'true'
         clean: 'false'
-        prefix: ${{ github.workspace }}/openwrt
+        prefix: /mnt/openwrt  # 更新路径到/mnt
 
     - name: 载入配置feeds
       run: |
-        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF /mnt/openwrt/feeds.conf.default  # 更新路径
         chmod +x $DIY_P1_SH
-        cd openwrt
+        cd /mnt/openwrt  # 更新路径
         $GITHUB_WORKSPACE/$DIY_P1_SH
 
     - name: 更新feeds
-      run: cd openwrt && ./scripts/feeds update -a
+      run: cd /mnt/openwrt && ./scripts/feeds update -a  # 更新路径
 
     - name: 安装feeds、更新日期
       run: |
-       cd openwrt && ./scripts/feeds install -a
+       cd /mnt/openwrt && ./scripts/feeds install -a  # 更新路径
        echo "DATE1=$(date "+%Y.%m.%d-%H:%M")" >> $GITHUB_ENV
 
     - name: 载入配置文件、修改固件日期
       run: |
-        [ -e files ] && mv files openwrt/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        [ -e files ] && mv files /mnt/openwrt/files  # 更新路径
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE /mnt/openwrt/.config  # 更新路径
         chmod +x $DIY_P2_SH
-        cd openwrt
+        cd /mnt/openwrt  # 更新路径
         $GITHUB_WORKSPACE/$DIY_P2_SH
         sed -i 's/OpenWrt/Build${{ env.DATE1 }} @ OpenWrt/g' package/lean/default-settings/files/zzz-default-settings
 
     - name: 下载软件包
       id: package
       run: |
-        cd openwrt
+        cd /mnt/openwrt  # 更新路径
         make defconfig
         make download -j8
-        # 优化：删除小于1KB的下载文件，可能是下载失败的文件
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
         df -h  # 显示下载后的磁盘使用情况
 
     - name: 编译前检查磁盘空间
       run: |
-        # 检查磁盘使用率，如果超过85%则退出
-        USAGE=$(df -h / | awk 'NR==2 {print $5}' | sed 's/%//')
-        if [ $USAGE -gt 85 ]; then
-          echo "磁盘空间不足，当前使用率: ${USAGE}%"
+        # 检查根分区和/mnt分区空间
+        ROOT_USAGE=$(df -h / | awk 'NR==2 {print $5}' | sed 's/%//')
+        MNT_USAGE=$(df -h /mnt | awk 'NR==2 {print $5}' | sed 's/%//')
+        echo "根分区使用率: ${ROOT_USAGE}%"
+        echo "/mnt分区使用率: ${MNT_USAGE}%"
+        
+        if [ $ROOT_USAGE -gt 85 ] || [ $MNT_USAGE -gt 90 ]; then
+          echo "磁盘空间不足，当前根分区使用率: ${ROOT_USAGE}%，/mnt分区使用率: ${MNT_USAGE}%"
           df -h
           exit 1
         fi
@@ -125,9 +136,8 @@ jobs:
     - name: 编译固件
       id: compile
       run: |
-        cd openwrt
+        cd /mnt/openwrt  # 更新路径
         echo -e "$(nproc) thread compile"
-        # 优化编译命令，使用更稳健的重试策略
         make $MAKEFLAGS || make -j1 || make -j1 V=s
         echo "status=success" >> $GITHUB_OUTPUT
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
@@ -145,13 +155,13 @@ jobs:
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
         name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: openwrt/bin
+        path: /mnt/openwrt/bin  # 更新路径
 
     - name: 整理文件
       id: organize
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
-        cd openwrt/bin/targets/*/*
+        cd /mnt/openwrt/bin/targets/*/*  # 更新路径
         rm -rf packages  # 删除不需要的包文件，节省空间
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
@@ -172,11 +182,11 @@ jobs:
         touch release.txt
         echo "从${{ env.TIME0 }}开始到${{ env.TIME1 }}编译完成！<br/>" >> release.txt
         echo " <br/><a href="https://github.com/coolsnowwolf/lede">lede</a> 更新记录:" >> release.txt
-        git -C openwrt log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
+        git -C /mnt/openwrt log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
         echo " <br/><br/><a href="https://github.com/coolsnowwolf/packages">packages</a>更新记录:" >> release.txt
-        git -C openwrt/feeds/packages log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
+        git -C /mnt/openwrt/feeds/packages log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
         echo " <br/><br/><a href="https://github.com/coolsnowwolf/luci">luci</a>更新记录:" >> release.txt
-        git -C openwrt/feeds/luci log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
+        git -C /mnt/openwrt/feeds/luci log -3 --date=format:'%Y-%m-%d %H:%M:%S' --pretty=format:"更新人:%an -- %cd<br/>更新内容: %s<br/>哈希: %H "  >> release.txt        
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: 上传固件到release发布页
