@@ -61,6 +61,17 @@ jobs:
         sudo chown $USER:$GROUPS /workdir
         df -h  # 显示磁盘使用情况
 
+
+
+
+    - name: 准备/mnt分区（创建目录并授权）
+      run: |
+       sudo mkdir -p /mnt/openwrt  # 提前创建目录
+       sudo chown -R $USER:$GROUPS /mnt/openwrt  # 授权当前用户
+       df -hT /mnt  # 验证目录存在
+    
+
+
     - name: 克隆源代码到/mnt分区
       working-directory: /mnt  # 关键修改：使用/mnt分区而非默认根分区
       run: |
