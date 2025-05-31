@@ -166,7 +166,8 @@ jobs:
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
         name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: /mnt/openwrt/bin  # 更新路径
+        path: /mnt/openwrt/bin  # 更新路径       
+        retention-days: 3       # <= 这里可以设置保留天数
 
     - name: 整理文件
       id: organize
@@ -183,7 +184,10 @@ jobs:
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: ${{ env.FIRMWARE }}
+        path: ${{ env.FIRMWARE }}    
+        retention-days: 3       # <= 这里可以设置保留天数
+
+
 
     - name: 创建release tag 生成更新信息
       id: tag
@@ -226,3 +230,16 @@ jobs:
         delete_tags: true
       env:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT  }}
+
+        
+    - name: 清理7天前的旧制品
+      if: always()  # 无论编译成功或失败都执行清理
+      uses: c-hive/gha-remove-artifacts@v1
+      with:
+        age: '7 days'  # 清理7天前的制品
+        skip-tags: true  # 跳过带标签的制品（保护正式发布）
+        skip-recent: 3   # 保留最近3个制品
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        
+
