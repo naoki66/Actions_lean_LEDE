@@ -1,7 +1,5 @@
 #
-# Copyright (c) 2019‑2025
-# Based on P3TERX <https://p3terx.com> Actions‑OpenWrt 项目
-# MIT License
+# Build LEDE‑X64  ‑‑ 包含编译耗时 & 上游更新日志
 #
 
 name: Build‑LEDE‑X64
@@ -9,14 +7,8 @@ name: Build‑LEDE‑X64
 on:
   repository_dispatch:
   workflow_dispatch:
-    inputs:
-      ssh:
-        description: '编译期间是否开启 SSH 调试会话 (true/false)'
-        required: false
-        default: 'false'
   schedule:
-    # 每 3 天北京时间 00:40 触发
-    - cron: '40 16 */3 * *'
+    - cron: '40 16 */3 * *'   # 每 3 天北京时间 00:40
 
 env:
   # ───── 源码与脚本 ─────
@@ -27,8 +19,7 @@ env:
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
 
-  # ───── 上传及发布选项 ─────
-  UPLOAD_BIN_DIR: 'false'
+  # ───── 上传/发布选项 ─────
   UPLOAD_FIRMWARE: 'true'
   UPLOAD_RELEASE: 'true'
 
@@ -46,157 +37,162 @@ jobs:
       cancel-in-progress: true
 
     steps:
-      # 1️⃣ 签出仓库
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+    # 1️⃣ 记录开始时间
+    - name: Set start time
+      run: |
+        echo "TIME0=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
 
-      # 2️⃣ 释放磁盘 + 安装依赖
-      - name: Prepare build environment
-        env: { DEBIAN_FRONTEND: noninteractive }
-        run: |
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
-                      /usr/lib/jvm  /usr/share/swift /usr/local/go \
-                      /opt/hostedtoolcache/* /usr/share/az_* \
-                      /usr/share/man /usr/share/doc /usr/share/groff /usr/share/info \
-                      /usr/share/lintian /usr/share/linda /usr/share/locale
-          sudo docker system prune -af --volumes
-          sudo apt-get -qq update
-          sudo apt-get -qq install -y build-essential clang flex bison g++ gawk \
-               gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev \
-               python3 unzip zlib1g-dev file wget rsync
-          sudo apt-get -qq autoremove --purge
-          sudo apt-get -qq clean
+    # 2️⃣ Checkout 当前仓库
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
 
-      # 3️⃣ 克隆源码到 /mnt（剩余空间大）
-      - name: Clone source to /mnt
-        run: |
-          echo "TIME0=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
-          sudo mkdir -p /mnt/openwrt && sudo chown $USER:$USER /mnt/openwrt
-          git clone --depth 1 "$REPO_URL" -b "$REPO_BRANCH" /mnt/openwrt
-          ln -sf /mnt/openwrt "$GITHUB_WORKSPACE/openwrt"
+    # 3️⃣ 清理磁盘 & 安装依赖
+    - name: Prepare build environment
+      env: { DEBIAN_FRONTEND: noninteractive }
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+                    /usr/lib/jvm /usr/share/swift /usr/local/go \
+                    /opt/hostedtoolcache/* /usr/share/az_* \
+                    /usr/share/man /usr/share/doc /usr/share/groff /usr/share/info \
+                    /usr/share/lintian /usr/share/linda /usr/share/locale
+        sudo docker system prune -af --volumes
+        sudo apt-get -qq update
+        sudo apt-get -qq install -y build-essential clang flex bison g++ gawk \
+             gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev \
+             python3 unzip zlib1g-dev file wget rsync
+        sudo apt-get -qq autoremove --purge
+        sudo apt-get -qq clean
 
-      # 4️⃣ 恢复 / 保存 ccache
-      - uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ${{ runner.os }}-openwrt
-          max-size: ${{ env.CCACHE_MAXSIZE }}
+    # 4️⃣ 克隆源码到 /mnt（剩余空间较大）
+    - name: Clone source to /mnt
+      run: |
+        sudo mkdir -p /mnt/openwrt && sudo chown $USER:$USER /mnt/openwrt
+        git clone --depth 1 "$REPO_URL" -b "$REPO_BRANCH" /mnt/openwrt
+        ln -sf /mnt/openwrt "$GITHUB_WORKSPACE/openwrt"
 
-      # 5️⃣ 恢复下载文件与工具链缓存
-      - uses: actions/cache@v3
-        with:
-          path: |
-            /mnt/openwrt/dl
-            /mnt/openwrt/build_dir/host
-          key: ${{ runner.os }}-lede-${{ hashFiles('include/**', 'package/**', 'target/**') }}
-          restore-keys: |
-            ${{ runner.os }}-lede-
+    # 5️⃣ ccache
+    - uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ runner.os }}-openwrt
+        max-size: ${{ env.CCACHE_MAXSIZE }}
 
-      # 6️⃣ 自定义脚本 & feeds
-      - name: Apply custom feeds
-        run: |
-          [ -e "$FEEDS_CONF" ] && mv "$FEEDS_CONF" /mnt/openwrt/feeds.conf.default
-          chmod +x "$DIY_P1_SH" "$DIY_P2_SH" || true
-          "$GITHUB_WORKSPACE/$DIY_P1_SH"
+    # 6️⃣ 缓存 dl & host 工具链
+    - uses: actions/cache@v3
+      with:
+        path: |
+          /mnt/openwrt/dl
+          /mnt/openwrt/build_dir/host
+        key: ${{ runner.os }}-lede-${{ hashFiles('include/**', 'package/**', 'target/**') }}
+        restore-keys: |
+          ${{ runner.os }}-lede-
 
-      - name: Update & install feeds
-        run: |
-          cd /mnt/openwrt
-          ./scripts/feeds update -a
-          ./scripts/feeds install -a
-          "$GITHUB_WORKSPACE/$DIY_P2_SH" || true
+    # 7️⃣ 自定义 feeds / 脚本
+    - name: Apply custom feeds
+      run: |
+        [ -e "$FEEDS_CONF" ] && mv "$FEEDS_CONF" /mnt/openwrt/feeds.conf.default
+        chmod +x "$DIY_P1_SH" "$DIY_P2_SH" || true
+        "$GITHUB_WORKSPACE/$DIY_P1_SH"
 
-      # 7️⃣ 下载源码包
-      - name: Download sources
-        run: |
-          cd /mnt/openwrt
-          make defconfig
-          make download -j8 || make download -j1 V=s
-          find dl -size -1024c -exec rm -f {} \;
+    # 8️⃣ 更新 feeds
+    - name: Update & install feeds
+      run: |
+        cd /mnt/openwrt
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+        "$GITHUB_WORKSPACE/$DIY_P2_SH" || true
 
-      # 8️⃣ 编译
-      - name: Compile
-        run: |
-          cd /mnt/openwrt
-          make $MAKEFLAGS || make -j1 V=s
-          echo "TIME1=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+    # 9️⃣ 生成上游更新日志
+    - name: Generate upstream changelog
+      run: |
+        cd /mnt/openwrt
 
-      # 9️⃣ 整理输出
-      - name: Organize firmware
-        id: organize
-        run: |
-          cd /mnt/openwrt/bin/targets/*/*
-          rm -rf packages
-          echo "FIRMWARE_DIR=$PWD" >> $GITHUB_ENV
+        # 确保不是 shallow clone，获取最近 30 条历史
+        git fetch --deepen=30 || true
+        git -C feeds/packages fetch --deepen=30 || true
+        git -C feeds/luci     fetch --deepen=30 || true
 
-      # 🔟 可选：打开 SSH 调试
-      - name: Debug via SSH
-        if: github.event.inputs.ssh == 'true'
-        uses: mxschmitt/action-tmate@v3
+        LOG_LEDE=$(git log   --date=short --pretty="- [%ad] %s" --no-merges -n 10)
+        LOG_PKG=$(git -C feeds/packages log --date=short --pretty="- [%ad] %s" --no-merges -n 10)
+        LOG_LUCI=$(git -C feeds/luci     log --date=short --pretty="- [%ad] %s" --no-merges -n 10)
 
-      # 11 上传固件 (Artifacts)
-      - name: Upload firmware artifact
-        if: env.UPLOAD_FIRMWARE == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: OpenWrt-firmware-${{ github.run_number }}
-          path: ${{ env.FIRMWARE_DIR }}
-          retention-days: 3
-          
-       # 12 计算编译时长 (在 Publish GitHub Release 之前)
-      - name: Calculate elapsed time
-        run: |
-          # 把 ISO 格式时间转换为时间戳
-          START_TS=$(date -d "${TIME0}" +%s)
-          END_TS=$(date -d "${TIME1}" +%s)
-          ELAPSED_SEC=$((END_TS - START_TS))
+        echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+        echo "### lede"   >> $GITHUB_ENV
+        echo "$LOG_LEDE"  >> $GITHUB_ENV
+        echo ""           >> $GITHUB_ENV
+        echo "### packages" >> $GITHUB_ENV
+        echo "$LOG_PKG"   >> $GITHUB_ENV
+        echo ""           >> $GITHUB_ENV
+        echo "### luci"   >> $GITHUB_ENV
+        echo "$LOG_LUCI"  >> $GITHUB_ENV
+        echo "EOF"        >> $GITHUB_ENV
 
-          # 计算 h:m:s
-          H=$((ELAPSED_SEC / 3600))
-          M=$(((ELAPSED_SEC % 3600) / 60))
-          S=$((ELAPSED_SEC % 60))
-          printf -v ELAPSED "%02dh %02dm %02ds" "$H" "$M" "$S"
+    # 🔟 下载依赖
+    - name: Download sources
+      run: |
+        cd /mnt/openwrt
+        make defconfig
+        make download -j8 || make download -j1 V=s
+        find dl -size -1024c -exec rm -f {} \;
 
-          # 写入环境变量，供后续步骤引用
-          echo "ELAPSED=${ELAPSED}" >> $GITHUB_ENV    
+    # 11️⃣ 编译
+    - name: Compile
+      run: |
+        cd /mnt/openwrt
+        make $MAKEFLAGS || make -j1 V=s
 
-      # 13 创建 Release 并上传
-      - name: Publish GitHub Release
-        if: env.UPLOAD_RELEASE == 'true' && github.ref == 'refs/heads/main'
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}   # ← 仅此一处声明，避免冲突
-        with:
-          tag_name: ${{ format('{0}', github.run_number) }}
-          body: |
-            从 **${{ env.TIME0 }}** 到 **${{ env.TIME1 }}** 编译完成。
-            总耗时 **${{ env.ELAPSED }}**
-          files: ${{ env.FIRMWARE_DIR }}/*
+    # 12️⃣ 记录结束时间 & 耗时
+    - name: Record end time & elapsed
+      run: |
+        echo "TIME1=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+        START=$(date -d "$TIME0" +%s)
+        END=$(date -d "$TIME1" +%s)
+        ELAPSED_SEC=$((END - START))
+        H=$((ELAPSED_SEC / 3600))
+        M=$(((ELAPSED_SEC % 3600) / 60))
+        S=$((ELAPSED_SEC % 60))
+        printf -v ELAPSED "%02dh %02dm %02ds" $H $M $S
+        echo "ELAPSED=$ELAPSED" >> $GITHUB_ENV
 
-      # 14 删除旧的工作流运行
-      - name: Delete workflow runs (keep 3 / 1 day)
-        uses: naoki66/delete-workflow-runs@main
-        with:
-          token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
-          retain_days: 1
-          keep_minimum_runs: 3
+    # 13️⃣ 整理固件
+    - name: Organize firmware
+      id: organize
+      run: |
+        cd /mnt/openwrt/bin/targets/*/*
+        rm -rf packages
+        echo "FIRMWARE_DIR=$PWD" >> $GITHUB_ENV
 
-      # 15 删除旧 Releases
-      - name: Delete older releases (keep 5)
-        if: env.UPLOAD_RELEASE == 'true'
-        uses: dev-drprasad/delete-older-releases@v1
-        with:
-          keep_latest: 5
-          delete_tags: true
-          token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
+    # 14️⃣ 上传固件 (Artifact)
+    - name: Upload firmware artifact
+      if: env.UPLOAD_FIRMWARE == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: OpenWrt-firmware-${{ github.run_number }}
+        path: ${{ env.FIRMWARE_DIR }}
+        retention-days: 3
 
-      # 16 清理 7 天前制品
-      - name: Remove artifacts older than 7 days
-        uses: c-hive/gha-remove-artifacts@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          age: '7 days'
-          skip-tags: true
-          skip-recent: 3
+    # 15️⃣ 发布 Release
+    - name: Publish GitHub Release
+      if: env.UPLOAD_RELEASE == 'true' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}   # ← 仅此一处声明
+      with:
+        tag_name: ${{ format('{0}', github.run_number) }}
+        body: |
+          📦 **编译时间段**  
+          ⏰ 从 **${{ env.TIME0 }}** 到 **${{ env.TIME1 }}**  
+          🕒 **总耗时：${{ env.ELAPSED }}**
+
+          🔄 **上游更新日志（最近 10 条）**  
+          ${{ env.CHANGELOG }}
+        files: ${{ env.FIRMWARE_DIR }}/*
+
+    # 16️⃣ 清理历史 (可选，保持不变)
+    - name: Delete older releases
+      if: env.UPLOAD_RELEASE == 'true'
+      uses: dev-drprasad/delete-older-releases@v1
+      with:
+        keep_latest: 5
+        delete_tags: true
+        token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
