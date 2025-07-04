@@ -25,7 +25,7 @@ jobs:
       - name: 拼接 Hash
         id: concat_hash
         run: |
-          echo "ALL=${{ steps.get_hash.outputs.LEDE }},${{ steps.get_hash.outputs.PACKAGES }},${{ steps.get_hash.outputs.LUCI }}" >> "$GITHUB_OUTPUT"
+          echo "ALL=${{ steps.get_hash.outputs.LEDE }}-${{ steps.get_hash.outputs.PACKAGES }}-${{ steps.get_hash.outputs.LUCI }}" >> "$GITHUB_OUTPUT"
 
       - name: 对比缓存中的 Hash
         id: cache_hash
