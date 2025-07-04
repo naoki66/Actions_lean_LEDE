@@ -1,76 +1,54 @@
-        #
-# Copyright (c) 2019-2022 P3TERX <https://p3terx.com>
-#
-# This is free software, licensed under the MIT License.
-# See /LICENSE for more information.
-#
-# https://github.com/P3TERX/Actions-OpenWrt
-# File: .github/workflows/Update_Checker.yml
-# Description: Source code update checker
-#
-
+# .github/workflows/update_checker.yml
 name: 更新检查
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: 20 2 */3 * *
+    - cron: '20 2 */3 * *'
+
+concurrency:
+  group: update-checker
+  cancel-in-progress: true
 
 jobs:
   check:
     runs-on: ubuntu-latest
 
     steps:
+      - name: 获取各仓库最新 Commit Hash
+        id: get_hash
+        run: |
+          echo "LEDE=$(git ls-remote https://github.com/coolsnowwolf/lede refs/heads/master | cut -f1)" >> "$GITHUB_OUTPUT"
+          echo "PACKAGES=$(git ls-remote https://github.com/coolsnowwolf/packages refs/heads/master | cut -f1)" >> "$GITHUB_OUTPUT"
+          echo "LUCI=$(git ls-remote https://github.com/coolsnowwolf/luci refs/heads/master | cut -f1)" >> "$GITHUB_OUTPUT"
 
-    - name: 获取Commit Hash
-      id: getHash
-      run: |
-        git clone --depth 1 https://github.com/coolsnowwolf/lede -b master lede
-        cd lede
-        echo "commitHash_Lede=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-        cd
-        
-        git clone --depth 1 https://github.com/coolsnowwolf/packages -b master ledepackage
-        cd ledepackage
-        echo "commitHash_Lede_Package=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-        cd
-        
-        git clone --depth 1 https://github.com/coolsnowwolf/luci -b master luci
-        cd luci
-        echo "commitHash_Lede_Luci=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-        cd      
+      - name: 拼接 Hash
+        id: concat_hash
+        run: |
+          echo "ALL=${{ steps.get_hash.outputs.LEDE }},${{ steps.get_hash.outputs.PACKAGES }},${{ steps.get_hash.outputs.LUCI }}" >> "$GITHUB_OUTPUT"
 
-         
-        
+      - name: 对比缓存中的 Hash
+        id: cache_hash
+        uses: actions/cache@v3
+        with:
+          path: .commit_hash
+          key: heads-${{ steps.concat_hash.outputs.ALL }}
 
-    - name: 整理Hash
-      id: combHeader
-      run: |
-       echo "commitHash_All=${{steps.getHash.outputs.commitHash_Lede}},${{steps.getHash.outputs.commitHash_Lede_Package}},${{steps.getHash.outputs.commitHash_Lede_Luci}} " >> $GITHUB_OUTPUT          
-    - name: 对比Commit Hash
-      id: cacheHash
-      uses: actions/cache@v3
-      with:
-        path: .commitHash_All
-        key: HEAD-${{steps.combHeader.outputs.commitHash_All}}
-   
+      - name: 保存新的 Hash
+        if: steps.cache_hash.outputs.cache-hit != 'true'
+        run: |
+          echo "${{ steps.concat_hash.outputs.ALL }}" > .commit_hash
 
-    - name: 保存新的Commit Hash
-      if: steps.cacheHash.outputs.cache-hit != 'true'
-      run: |
-        echo ${{ steps.combHeader.outputs.commitHash_All }} | tee .commitHash_All
+      - name: 删除旧的运行记录
+        uses: naoki66/delete-workflow-runs@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          retain_days: 1
+          keep_minimum_runs: 1
 
-    - name: 删除运行记录
-      uses: naoki66/delete-workflow-runs@main
-      with:
-        retain_days: 1
-        keep_minimum_runs: 1
-        
-    - name: 触发编译
-      if: steps.cacheHash.outputs.cache-hit != 'true'
-      uses: peter-evans/repository-dispatch@main
-      with:
-        token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
-        event-type: 上游源码更新触发编译
-
-
+      - name: 触发编译
+        if: steps.cache_hash.outputs.cache-hit != 'true'
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
+          event-type: 上游源码更新触发编译
