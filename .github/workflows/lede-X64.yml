@@ -135,7 +135,7 @@ jobs:
         if: github.event.inputs.ssh == 'true'
         uses: mxschmitt/action-tmate@v3
 
-      # 11️⃣ 上传固件 (Artifacts)
+      # 11 上传固件 (Artifacts)
       - name: Upload firmware artifact
         if: env.UPLOAD_FIRMWARE == 'true'
         uses: actions/upload-artifact@v4
@@ -143,8 +143,25 @@ jobs:
           name: OpenWrt-firmware-${{ github.run_number }}
           path: ${{ env.FIRMWARE_DIR }}
           retention-days: 3
+          
+       # 12 计算编译时长 (在 Publish GitHub Release 之前)
+      - name: Calculate elapsed time
+        run: |
+          # 把 ISO 格式时间转换为时间戳
+          START_TS=$(date -d "${TIME0}" +%s)
+          END_TS=$(date -d "${TIME1}" +%s)
+          ELAPSED_SEC=$((END_TS - START_TS))
 
-      # 12️⃣ 创建 Release 并上传
+          # 计算 h:m:s
+          H=$((ELAPSED_SEC / 3600))
+          M=$(((ELAPSED_SEC % 3600) / 60))
+          S=$((ELAPSED_SEC % 60))
+          printf -v ELAPSED "%02dh %02dm %02ds" "$H" "$M" "$S"
+
+          # 写入环境变量，供后续步骤引用
+          echo "ELAPSED=${ELAPSED}" >> $GITHUB_ENV    
+
+      # 13 创建 Release 并上传
       - name: Publish GitHub Release
         if: env.UPLOAD_RELEASE == 'true' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
@@ -154,9 +171,10 @@ jobs:
           tag_name: ${{ format('{0}', github.run_number) }}
           body: |
             从 **${{ env.TIME0 }}** 到 **${{ env.TIME1 }}** 编译完成。
+            总耗时 **${{ env.ELAPSED }}**
           files: ${{ env.FIRMWARE_DIR }}/*
 
-      # 13️⃣ 删除旧的工作流运行
+      # 14 删除旧的工作流运行
       - name: Delete workflow runs (keep 3 / 1 day)
         uses: naoki66/delete-workflow-runs@main
         with:
@@ -164,7 +182,7 @@ jobs:
           retain_days: 1
           keep_minimum_runs: 3
 
-      # 14️⃣ 删除旧 Releases
+      # 15 删除旧 Releases
       - name: Delete older releases (keep 5)
         if: env.UPLOAD_RELEASE == 'true'
         uses: dev-drprasad/delete-older-releases@v1
@@ -173,7 +191,7 @@ jobs:
           delete_tags: true
           token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
 
-      # 15️⃣ 清理 7 天前制品
+      # 16 清理 7 天前制品
       - name: Remove artifacts older than 7 days
         uses: c-hive/gha-remove-artifacts@v2
         env:
