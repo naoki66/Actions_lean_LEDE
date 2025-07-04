@@ -40,7 +40,7 @@ jobs:
           echo "${{ steps.concat_hash.outputs.ALL }}" > .commit_hash
 
       - name: 删除旧的运行记录
-        uses: naoki66/delete-workflow-runs@v3
+        uses: naoki66/delete-workflow-runs@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           retain_days: 1
