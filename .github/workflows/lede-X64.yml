@@ -191,7 +191,7 @@ jobs:
     # 16️⃣ 清理历史 (可选，保持不变)
     - name: Delete older releases
       if: env.UPLOAD_RELEASE == 'true'
-      uses: dev-drprasad/delete-older-releases@v1
+      uses: dev-drprasad/delete-older-releases@v0.3.4
       with:
         keep_latest: 5
         delete_tags: true
