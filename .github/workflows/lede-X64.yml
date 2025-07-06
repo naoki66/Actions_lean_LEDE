@@ -137,7 +137,6 @@ jobs:
       run: |
         {
         echo "CHANGELOG_CONTENT<<EOF"
-        echo "📦 上游更新日志"
         echo "##🔧 [lede 主仓库](https://github.com/coolsnowwolf/lede)"
         curl -s "https://api.github.com/repos/coolsnowwolf/lede/commits?since=$(date -d '-3 days' --iso-8601=s)" | jq -r '.[] | "- [\(.commit.committer.date)] \(.commit.message | split("\n")[0])"'
         echo "##📦 [lede packages](https://github.com/coolsnowwolf/packages)"
