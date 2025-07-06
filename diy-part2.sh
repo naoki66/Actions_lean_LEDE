@@ -29,5 +29,20 @@ sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' package/lean/default-settings/files/zzz
 #sed -i 's, <%=luci.sys.exec("cat /etc/bench.log") or " "%><,<,g'  package/lean/autocore/files/x86/index.htm
 #rm -rf ./feeds/packages/utils/coremark
 
-##干掉wan6和ula_prefix
-#sed -i "/uci commit fstab/a\uci delete network.wan6\nuci delete network.globals.ula_prefix\nuci set dhcp.lan.start=\'50\'\nuci set network.lan.ip6assign=\'64\'\nuci set network.globals.packet_steering=0\nuci commit network" package/lean/default-settings/files/zzz-default-settings
+# 删除WAN6接口配置
+#sed -i "/uci commit fstab/a\uci delete network.wan6" package/lean/default-settings/files/zzz-default-settings
+
+# 删除ULA前缀配置
+sed -i "/uci commit fstab/a\uci delete network.globals.ula_prefix" package/lean/default-settings/files/zzz-default-settings
+
+# 设置LAN和全局网络参数
+sed -i "/uci commit fstab/a\nuci set dhcp.lan.start='50'" package/lean/default-settings/files/zzz-default-settings
+
+# 设置IPv6分配长度
+sed -i "/uci commit fstab/a\nuci set network.lan.ip6assign='64'" package/lean/default-settings/files/zzz-default-settings
+
+# 设置IPv6后缀为eui64自动生成
+sed -i "/uci set network.lan.ip6assign='64'/a\nuci set network.lan.ip6hint='eui64'" package/lean/default-settings/files/zzz-default-settings
+
+# 设置RA flags为none
+sed -i "/uci set network.lan.ip6hint='eui64'/a\nuci set network.lan.ra_flags='none'\nuci commit network" package/lean/default-settings/files/zzz-default-settings

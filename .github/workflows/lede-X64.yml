@@ -22,7 +22,8 @@ env:
   # ───── 构建参数 ─────
   TZ: Asia/Shanghai
   CCACHE_DIR: ${{ github.workspace }}/.ccache
-  CCACHE_MAXSIZE: "800M"
+  CCACHE_COMPRESS: '1'
+  CCACHE_MAXSIZE: "2G"
 
 jobs:
   build-firmware:
@@ -104,7 +105,11 @@ jobs:
     - name: 缓存 host tools
       uses: actions/cache@v4
       with:
-        path: /mnt/openwrt/build_dir/host
+        path: |
+          /mnt/openwrt/build_dir/host/ccache*
+          /mnt/openwrt/build_dir/host/*/stamp
+          /mnt/openwrt/build_dir/host/.built
+          /mnt/openwrt/build_dir/host/.configured_*
         key: hosttools-${{ hashFiles('include/**') }}
         restore-keys: hosttools-
 
@@ -112,7 +117,7 @@ jobs:
     # 7️⃣ 自定义 feeds
     - name: 应用自定义 feeds和config
       run: |
-        [ -e files ] && cp "$GITHUB_WORKSPACE/files" /mnt/openwrt/files   || echo "::warning::没有定义 配置文件files"
+        [ -e files ] && cp-r "$GITHUB_WORKSPACE/files" /mnt/openwrt/files   || echo "::warning::没有定义 配置文件files"
         [ -f "$DIY_P1_SH" ] && chmod +x "$DIY_P1_SH" && "$GITHUB_WORKSPACE/$DIY_P1_SH" || echo "::notice::没有定义 配置文件DIY_P1_SH"
         [ -e $CONFIG_FILE ] && cp "$GITHUB_WORKSPACE/$CONFIG_FILE" /mnt/openwrt/.config || echo "::warning::没有定义 配置文件CONFIG_FILE"        
         cd /mnt/openwrt  && make defconfig
@@ -128,23 +133,17 @@ jobs:
         [ -f "$GITHUB_WORKSPACE/$DIY_P2_SH" ] && chmod +x "$GITHUB_WORKSPACE/$DIY_P2_SH" && "$GITHUB_WORKSPACE/$DIY_P2_SH" || echo "::notice::没有定义 配置文件DIY_P2_SH"
 
     # 9️⃣ 生成上游更新日志
-    - name: 生成上游更新日志
+    - name: 通过API生成上游更新日志
       run: |
-        cd /mnt/openwrt
-        # 拉取最新提交记录（失败不阻断）
-        git fetch --deepen=30 || true
-        git -C feeds/packages fetch --deepen=30 || true
-        git -C feeds/luci fetch --deepen=30 || true
-        # 设置多行环境变量 CHANGELOG_CONTENT
         {
         echo "CHANGELOG_CONTENT<<EOF"
         echo "📦 上游更新日志"
         echo "##🔧 [lede 主仓库](https://github.com/coolsnowwolf/lede)"
-        git log --date=short --pretty="- [%ad] %s" --no-merges -n 15
+        curl -s "https://api.github.com/repos/coolsnowwolf/lede/commits?since=$(date -d '-3 days' --iso-8601=s)" | jq -r '.[] | "- [\(.commit.committer.date)] \(.commit.message | split("\n")[0])"'
         echo "##📦 [lede packages](https://github.com/coolsnowwolf/packages)"
-        git -C feeds/packages log --date=short --pretty="- [%ad] %s" --no-merges -n 10
+        curl -s "https://api.github.com/repos/coolsnowwolf/packages/commits?since=$(date -d '-3 days' --iso-8601=s)" | jq -r '.[] | "- [\(.commit.committer.date)] \(.commit.message | split("\n")[0])"'
         echo "##🖥️ [lede luci](https://github.com/coolsnowwolf/luci)"
-        git -C feeds/luci log --date=short --pretty="- [%ad] %s" --no-merges -n 10
+        curl -s "https://api.github.com/repos/coolsnowwolf/luci/commits?since=$(date -d '-3 days' --iso-8601=s)" | jq -r '.[] | "- [\(.commit.committer.date)] \(.commit.message | split("\n")[0])"'
         echo "EOF"
         } >> $GITHUB_ENV
 
