@@ -86,15 +86,15 @@ jobs:
       uses: actions/cache@v4
       with:
         path: /mnt/openwrt/dl
-        key: dl-${{ runner.os }}-${{ hashFiles('feeds.conf.default') }}
+        key: dl-${{ runner.os }}-lede-x86
         restore-keys: dl-${{ runner.os }}-
 
     - name: 恢复 Feeds 缓存
       uses: actions/cache@v4
       with:
         path: /mnt/openwrt/feeds
-        key: feeds-${{ runner.os }}-${{ hashFiles('feeds.conf.default') }}
-        restore-keys: feeds-${{ runner.os }}-
+        key: feeds-${{ runner.os }}
+        restore-keys: feeds-${{ runner.os }}-lede-x86
 
     - name: 恢复工具链缓存
       uses: actions/cache@v4
@@ -116,10 +116,14 @@ jobs:
           ${{ runner.os }}-lede-
 
     # 7️⃣ 自定义 feeds
-    - name: 应用自定义 feeds
+    - name: 应用自定义 feeds和config
       run: |
-        [ -e "$FEEDS_CONF" ] && mv "$FEEDS_CONF" /mnt/openwrt/feeds.conf.default || echo "::warning::未找到 $FEEDS_CONF"
-        [ -f "$DIY_P1_SH" ] && chmod +x "$DIY_P1_SH" && "$GITHUB_WORKSPACE/$DIY_P1_SH" || echo "::notice::未找到 $DIY_P1_SH"
+        [ -e files ] && mv files /mnt/openwrt/files   || echo "::warning::没有定义 配置文件files"
+        [ -f "$DIY_P1_SH" ] && chmod +x "$DIY_P1_SH" && "$GITHUB_WORKSPACE/$DIY_P1_SH" || echo "::notice::没有定义 配置文件DIY_P1_SH"
+        [ -e $CONFIG_FILE ] && mv "$CONFIG_FILE" /mnt/openwrt/.config || echo "::warning::未找到 $CONFIG_FILE"        
+        cd /mnt/openwrt  && make defconfig
+        sed -i 's/OpenWrt/Build${{ env.RELEASE_TAG }} @ OpenWrt/g' package/lean/default-settings/files/zzz-default-settings
+
 
     # 8️⃣ 更新和安装 feeds（始终执行，无条件）
     - name: 更新和安装 feeds
@@ -127,7 +131,7 @@ jobs:
         cd /mnt/openwrt
         ./scripts/feeds update -a
         ./scripts/feeds install -a -f
-        [ -f "$GITHUB_WORKSPACE/$DIY_P2_SH" ] && chmod +x "$GITHUB_WORKSPACE/$DIY_P2_SH" && "$GITHUB_WORKSPACE/$DIY_P2_SH"
+        [ -f "$GITHUB_WORKSPACE/$DIY_P2_SH" ] && chmod +x "$GITHUB_WORKSPACE/$DIY_P2_SH" && "$GITHUB_WORKSPACE/$DIY_P2_SH" || echo "::notice::没有定义 配置文件DIY_P2_SH"
 
     # 9️⃣ 生成上游更新日志
     - name: 生成上游更新日志
@@ -237,10 +241,8 @@ jobs:
           📦 **编译时间段**  
           ⏰ 从 **${{ env.TIME0 }}** 到 **${{ env.TIME1 }}**  
           🕒 **总耗时：${{ env.ELAPSED }}**
-
           🔄 **上游更新日志**  
-          [查看完整更新日志](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          ### 上游更新日志预览
+          
           $(cat ${{ env.CHANGELOG_FILE }})
         files: |
           ${{ env.FIRMWARE_DIR }}/*
