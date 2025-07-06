@@ -1,4 +1,4 @@
-name: "构建LEDE-X64固件"
+name: "构建LEDE-X86X64固件"
 
 on:
   repository_dispatch:
@@ -80,17 +80,34 @@ jobs:
         restore-keys: ccache-
 
     # 6️⃣ DL / Feeds / 工具链缓存命中
-    - name: 恢复ccache
+    - name: 缓存 dl
       uses: actions/cache@v4
-      id: build-cache
       with:
-        path: |
-          /mnt/openwrt/dl
-          /mnt/openwrt/build_dir/host
-          /mnt/openwrt/feeds
-          /mnt/openwrt/staging_dir         # toolchain缓存
-        key: build-lede-${{ hashFiles('include/**', 'package/**', 'target/**') }}
-        restore-keys: build-lede-
+        path: /mnt/openwrt/dl
+        key: dl-${{ hashFiles('feeds.conf.default') }}
+        restore-keys: dl-
+
+    - name: 缓存 toolchain
+      uses: actions/cache@v4
+      with:
+        path: /mnt/openwrt/staging_dir
+        key: toolchain-${{ hashFiles('toolchain/**', 'include/**') }}
+        restore-keys: toolchain-
+
+    - name: 缓存 feeds
+      uses: actions/cache@v4
+      with:
+        path: /mnt/openwrt/feeds
+        key: feeds-${{ hashFiles('feeds.conf.default') }}
+        restore-keys: feeds-
+
+    - name: 缓存 host tools
+      uses: actions/cache@v4
+      with:
+        path: /mnt/openwrt/build_dir/host
+        key: hosttools-${{ hashFiles('include/**') }}
+        restore-keys: hosttools-
+
 
     # 7️⃣ 自定义 feeds
     - name: 应用自定义 feeds和config
@@ -125,9 +142,9 @@ jobs:
         echo "##🔧 [lede 主仓库](https://github.com/coolsnowwolf/lede)"
         git log --date=short --pretty="- [%ad] %s" --no-merges -n 15
         echo "##📦 [lede packages](https://github.com/coolsnowwolf/packages)"
-        git -C feeds/packages log --date=short --pretty="- [%ad] %s" --no-merges -n 10 "
+        git -C feeds/packages log --date=short --pretty="- [%ad] %s" --no-merges -n 10
         echo "##🖥️ [lede luci](https://github.com/coolsnowwolf/luci)"
-        git -C feeds/luci log --date=short --pretty="- [%ad] %s" --no-merges -n 10 "
+        git -C feeds/luci log --date=short --pretty="- [%ad] %s" --no-merges -n 10
         echo "EOF"
         } >> $GITHUB_ENV
 
