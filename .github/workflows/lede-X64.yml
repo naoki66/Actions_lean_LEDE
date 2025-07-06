@@ -26,7 +26,8 @@ env:
   CCACHE_MAXSIZE: "500M"
 
 jobs:
-  构建固件:
+  build-firmware:  
+    name: 构建固件  
     runs-on: ubuntu-22.04
     concurrency:
       group: lede-${{ github.ref }}
