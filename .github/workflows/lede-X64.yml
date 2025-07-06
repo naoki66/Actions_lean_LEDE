@@ -42,8 +42,9 @@ jobs:
         echo "RELEASE_TAG=$(date '+%Y.%m.%d-%H%M')" >> $GITHUB_ENV
         echo "生成发布标签: $RELEASE_TAG"
 
-    # 2️⃣ 检出仓库
-    - uses: actions/checkout@v4
+    # 2️⃣ 将仓库代码拉取到工作流的环境中
+    - name: 检出仓库
+      uses: actions/checkout@v4
 
     # 3️⃣ 准备构建环境
     - name: 准备构建环境
