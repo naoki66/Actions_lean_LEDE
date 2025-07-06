@@ -76,10 +76,10 @@ jobs:
       uses: actions/cache@v4
       with:
         path: /mnt/openwrt/.ccache
-        key: ccache-${{ runner.os }}-${{ hashFiles('toolchain/**', 'include/**') }}
-        restore-keys: ccache-${{ runner.os }}-
+        key: ccache-${{ hashFiles('toolchain/**', 'include/**') }}
+        restore-keys: ccache-
 
-    # 6️⃣ DL / Feeds / 工具链缓存恢复
+    # 6️⃣ DL / Feeds / 工具链缓存命中
     - name: 恢复ccache
       uses: actions/cache@v4
       id: build-cache
@@ -88,11 +88,9 @@ jobs:
           /mnt/openwrt/dl
           /mnt/openwrt/build_dir/host
           /mnt/openwrt/feeds
-          /mnt/openwrt/staging_dir
-        key: ${{ runner.os }}-lede-${{ env.SOURCE_COMMIT }}-${{ hashFiles('include/**', 'package/**', 'target/**') }}
-        restore-keys: |
-          ${{ runner.os }}-lede-${{ env.SOURCE_COMMIT }}-
-          ${{ runner.os }}-lede-
+          /mnt/openwrt/staging_dir         # toolchain缓存
+        key: build-lede-${{ hashFiles('include/**', 'package/**', 'target/**') }}
+        restore-keys: build-lede-
 
     # 7️⃣ 自定义 feeds
     - name: 应用自定义 feeds和config
