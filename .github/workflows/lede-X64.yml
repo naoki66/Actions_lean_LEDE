@@ -22,7 +22,7 @@ env:
   # ───── 构建参数 ─────
   TZ: Asia/Shanghai
   CCACHE_DIR: ${{ github.workspace }}/.ccache
-  CCACHE_MAXSIZE: "500M"
+  CCACHE_MAXSIZE: "800M"
 
 jobs:
   build-firmware:
@@ -36,7 +36,6 @@ jobs:
     # 1️⃣ 记录开始时间
     - name: 记录开始时间
       run: |
-        echo "BUILD_START=$(date +%s)" >> "$GITHUB_ENV"
         echo "TIME0=$(date '+%Y-%m-%d %H:%M:%S')" >> "$GITHUB_ENV"
         echo "RELEASE_TAG=$(date '+%Y.%m.%d-%H%M')" >> $GITHUB_ENV
 
@@ -77,38 +76,19 @@ jobs:
       uses: actions/cache@v4
       with:
         path: /mnt/openwrt/.ccache
-        key: ccache-${{ runner.os }}-${{ github.run_id }}
+        key: ccache-${{ runner.os }}-${{ hashFiles('toolchain/**', 'include/**') }}
         restore-keys: ccache-${{ runner.os }}-
 
-    # 6️⃣ DL / Feeds / 工具链缓存
-    - name: 恢复 DL 缓存
+    # 6️⃣ DL / Feeds / 工具链缓存恢复
+    - name: 恢复ccache
       uses: actions/cache@v4
-      with:
-        path: /mnt/openwrt/dl
-        key: dl-${{ runner.os }}-lede-x86
-        restore-keys: dl-${{ runner.os }}-
-
-    - name: 恢复 Feeds 缓存
-      uses: actions/cache@v4
-      with:
-        path: /mnt/openwrt/feeds
-        key: feeds-${{ runner.os }}
-        restore-keys: feeds-${{ runner.os }}-lede-x86
-
-    - name: 恢复工具链缓存
-      uses: actions/cache@v4
-      with:
-        path: /mnt/openwrt/staging_dir
-        key: toolchain-${{ runner.os }}-${{ github.run_id }}
-        restore-keys: toolchain-${{ runner.os }}-
-
-    - name: 设置依赖缓存
-      uses: actions/cache@v4
-      id: dl-cache
+      id: build-cache
       with:
         path: |
           /mnt/openwrt/dl
           /mnt/openwrt/build_dir/host
+          /mnt/openwrt/feeds
+          /mnt/openwrt/staging_dir
         key: ${{ runner.os }}-lede-${{ env.SOURCE_COMMIT }}-${{ hashFiles('include/**', 'package/**', 'target/**') }}
         restore-keys: |
           ${{ runner.os }}-lede-${{ env.SOURCE_COMMIT }}-
