@@ -170,6 +170,7 @@ jobs:
           make -j1 V=s 2>&1 | tee -a logs/build.log || exit 1
         fi
         echo "::notice::ccache 编译后：" && ccache -s
+        echo "TIME1=$(date '+%Y-%m-%d %H:%M:%S')" >> "$GITHUB_ENV"
 
     # 1️⃣2️⃣ 上传编译日志
     - name: 上传编译日志
@@ -183,7 +184,6 @@ jobs:
     # 1️⃣3️⃣ 记录结束时间和耗时
     - name: 记录结束时间和耗时
       run: |
-        echo "TIME1=$(date '+%Y-%m-%d %H:%M:%S')" >> "$GITHUB_ENV"
         # 将 TIME0 和 TIME1 转换为 Unix 时间戳（秒）
         START_TIME=$(date -u -d "${{ env.TIME0 }}" +%s)
         END_TIME=$(date -u -d "${{ env.TIME1 }}" +%s)
