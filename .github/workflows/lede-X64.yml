@@ -118,9 +118,9 @@ jobs:
     # 7️⃣ 自定义 feeds
     - name: 应用自定义 feeds和config
       run: |
-        [ -e files ] && mv files /mnt/openwrt/files   || echo "::warning::没有定义 配置文件files"
+        [ -e files ] && cp "$GITHUB_WORKSPACE/files" /mnt/openwrt/files   || echo "::warning::没有定义 配置文件files"
         [ -f "$DIY_P1_SH" ] && chmod +x "$DIY_P1_SH" && "$GITHUB_WORKSPACE/$DIY_P1_SH" || echo "::notice::没有定义 配置文件DIY_P1_SH"
-        [ -e $CONFIG_FILE ] && mv "$CONFIG_FILE" /mnt/openwrt/.config || echo "::warning::未找到 CONFIG_FILE"        
+        [ -e $CONFIG_FILE ] && cp "$GITHUB_WORKSPACE/$CONFIG_FILE" /mnt/openwrt/.config || echo "::warning::没有定义 配置文件CONFIG_FILE"        
         cd /mnt/openwrt  && make defconfig
         sed -i 's/OpenWrt/Build${{ env.RELEASE_TAG }} @ OpenWrt/g' package/lean/default-settings/files/zzz-default-settings
 
