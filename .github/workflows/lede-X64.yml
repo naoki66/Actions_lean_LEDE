@@ -21,7 +21,6 @@ env:
 
   # ───── 构建参数 ─────
   TZ: Asia/Shanghai
-  MAKEFLAGS: "-j$(nproc) V=s"
   CCACHE_DIR: ${{ github.workspace }}/.ccache
   CCACHE_MAXSIZE: "500M"
 
@@ -177,7 +176,7 @@ jobs:
         cd /mnt/openwrt
         mkdir -p logs
         echo "::notice::ccache 统计：" && ccache -s
-        if ! make $MAKEFLAGS 2>&1 | tee logs/build.log; then
+        if ! make -j2 V=s 2>&1 | tee logs/build.log; then
           echo "::error::并行编译失败，尝试单线程"
           make -j1 V=s 2>&1 | tee -a logs/build.log || exit 1
         fi
