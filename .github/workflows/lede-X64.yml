@@ -37,6 +37,9 @@ jobs:
     - name: 记录开始时间
       run: |
         echo "TIME0=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+        # 生成日期时间格式的标签 (YYYY.MM.DD-HHMM)
+        echo "RELEASE_TAG=$(date '+%Y.%m.%d-%H%M')" >> $GITHUB_ENV
+        echo "生成发布标签: $RELEASE_TAG"
 
     # 2️⃣ 检出仓库
     - uses: actions/checkout@v4
@@ -152,13 +155,13 @@ jobs:
         {
           echo "📦 LEDE 上游更新日志 (分支: $REPO_BRANCH)"
           echo
-          echo "### LEDE 主仓库 (最近 15 条)"
+          echo "##🔧 [lede 主仓库]( https://github.com/coolsnowwolf/lede )(最近 15 条)"
           echo "$LOG_LEDE"
           echo
-          echo "### Packages 仓库 (最近 10 条)"
+          echo "##📦 [packages 仓库]( https://github.com/coolsnowwolf/packages ) (最近 10 条)"
           echo "$LOG_PKG"
           echo
-          echo "### LuCI 仓库 (最近 10 条)"
+          echo "##🖥️ [luci 仓库]( https://github.com/coolsnowwolf/luci ) (最近 10 条)"
           echo "$LOG_LUCI"
         } > $GITHUB_WORKSPACE/changelog/complete_changelog.txt
         
@@ -236,7 +239,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}
       with:
-        tag_name: build-${{ github.run_number }}
+        tag_name: ${{ env.RELEASE_TAG }}
         name: 构建 #${{ github.run_number }} (耗时 ${{ env.ELAPSED }})
         body: |
           📦 **编译时间段**  
@@ -245,15 +248,8 @@ jobs:
           
           🔄 **上游更新日志**  
           [查看完整更新日志](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          
-          ### 简要日志预览
-          <details>
-          <summary>点击展开日志预览</summary>
-          
-          $(head -n 15 ${{ env.CHANGELOG_FILE }})
-          
-          ...
-          </details>
+          ### 上游更新日志预览
+          $(cat ${{ env.CHANGELOG_FILE }})
         files: |
           ${{ env.FIRMWARE_DIR }}/*
           ${{ env.CHANGELOG_FILE }}
