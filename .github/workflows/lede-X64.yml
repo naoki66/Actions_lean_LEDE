@@ -136,26 +136,29 @@ jobs:
     - name: 生成上游更新日志
       run: |
         cd /mnt/openwrt
-        git fetch --deepen=30 || true
-        git -C feeds/packages fetch --deepen=30 || true
-        git -C feeds/luci fetch --deepen=30 || true
-        mkdir -p $GITHUB_WORKSPACE/changelog
-        LOG_LEDE=$(git log --date=short --pretty="- [%ad] %s" --no-merges -n 15)
-        LOG_PKG=$(git -C feeds/packages log --date=short --pretty="- [%ad] %s" --no-merges -n 10 || echo "packages 仓库不可用")
-        LOG_LUCI=$(git -C feeds/luci log --date=short --pretty="- [%ad] %s" --no-merges -n 10 || echo "luci 仓库不可用")
-        {
-          echo "📦 LEDE 上游更新日志 (分支: $REPO_BRANCH)"
-          echo
-          echo "##🔧 [lede 主仓库](https://github.com/coolsnowwolf/lede)"
-          echo "$LOG_LEDE"
-          echo
-          echo "##📦 [packages](https://github.com/coolsnowwolf/packages)"
-          echo "$LOG_PKG"
-          echo
-          echo "##🖥️ [luci](https://github.com/coolsnowwolf/luci)"
-          echo "$LOG_LUCI"
-        } > $GITHUB_WORKSPACE/changelog/complete_changelog.txt
-        echo "CHANGELOG_FILE=$GITHUB_WORKSPACE/changelog/complete_changelog.txt" >> $GITHUB_ENV
+          git fetch --deepen=30 || true
+          git -C feeds/packages fetch --deepen=30 || true
+          git -C feeds/luci fetch --deepen=30 || true
+          
+          LOG_LEDE=$(git log --date=short --pretty="- [%ad] %s" --no-merges -n 15)
+          LOG_PKG=$(git -C feeds/packages log --date=short --pretty="- [%ad] %s" --no-merges -n 10 || echo "packages 仓库不可用")
+          LOG_LUCI=$(git -C feeds/luci log --date=short --pretty="- [%ad] %s" --no-merges -n 10 || echo "luci 仓库不可用")
+          
+          # 构建完整的更新日志内容
+          CHANGELOG_CONTENT=$(cat <<EOF
+          📦 LEDE 上游更新日志 
+           ##🔧 [lede 主仓库](https://github.com/coolsnowwolf/lede)
+           $LOG_LEDE
+           ##📦 [packages](https://github.com/coolsnowwolf/packages)
+           $LOG_PKG
+           ##🖥️ [luci](https://github.com/coolsnowwolf/luci)
+           $LOG_LUCI
+           EOF
+           )
+          # 将多行内容安全地设置到环境变量中
+          echo "CHANGELOG_CONTENT<<EOF" >> $GITHUB_ENV
+          echo "$CHANGELOG_CONTENT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
     # 1️⃣0️⃣ 下载源码依赖
     - name: 下载源码依赖
@@ -245,7 +248,7 @@ jobs:
           ⏰ 从 **${{ env.TIME0 }}** 到 **${{ env.TIME1 }}**  
           🕒 **总耗时：${{ env.ELAPSED }}**
           🔄 **上游更新日志**  
-          ${{ github.fileContent(env.CHANGELOG_FILE) || '无更新日志内容' }}
+          ${{ env.CHANGELOG_CONTENT || '无更新日志内容' }}
         files: |
           ${{ env.FIRMWARE_DIR }}/*
           ${{ env.CHANGELOG_FILE }}
