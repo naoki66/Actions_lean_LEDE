@@ -136,31 +136,22 @@ jobs:
     - name: 生成上游更新日志
       run: |
         cd /mnt/openwrt
+        # 拉取最新提交记录（失败不阻断）
         git fetch --deepen=30 || true
         git -C feeds/packages fetch --deepen=30 || true
         git -C feeds/luci fetch --deepen=30 || true
-    
-        LOG_LEDE=$(git log --date=short --pretty="- [%ad] %s" --no-merges -n 15)
-        LOG_PKG=$(git -C feeds/packages log --date=short --pretty="- [%ad] %s" --no-merges -n 10 || echo "packages 仓库不可用")
-        LOG_LUCI=$(git -C feeds/luci log --date=short --pretty="- [%ad] %s" --no-merges -n 10 || echo "luci 仓库不可用")
-    
-        # 构建完整的更新日志内容（EOF必须顶格，无缩进）
-        CHANGELOG_CONTENT=$(cat <<EOF
-📦 上游更新日志 
-
-##🔧 [lede 主仓库](https://github.com/coolsnowwolf/lede)
-$LOG_LEDE
-##📦 [packages](https://github.com/coolsnowwolf/packages)
-$LOG_PKG
-##🖥️ [luci](https://github.com/coolsnowwolf/luci)
-$LOG_LUCI
-EOF
-)
-
-    # 将多行内容设置到环境变量中（EOF必须顶格）
-    echo "CHANGELOG_CONTENT<<EOF" >> $GITHUB_ENV
-    echo "$CHANGELOG_CONTENT" >> $GITHUB_ENV
-    echo "EOF" >> $GITHUB_ENV
+        # 设置多行环境变量 CHANGELOG_CONTENT
+        {
+        echo "CHANGELOG_CONTENT<<EOF"
+        echo "📦 上游更新日志"
+        echo "##🔧 [lede 主仓库](https://github.com/coolsnowwolf/lede)"
+        git log --date=short --pretty="- [%ad] %s" --no-merges -n 15
+        echo "##📦 [lede packages](https://github.com/coolsnowwolf/packages)"
+        git -C feeds/packages log --date=short --pretty="- [%ad] %s" --no-merges -n 10 "
+        echo "##🖥️ [lede luci](https://github.com/coolsnowwolf/luci)"
+        git -C feeds/luci log --date=short --pretty="- [%ad] %s" --no-merges -n 10 "
+        echo "EOF"
+        } >> $GITHUB_ENV
 
     # 1️⃣0️⃣ 下载源码依赖
     - name: 下载源码依赖
@@ -224,19 +215,10 @@ EOF
       if: env.UPLOAD_FIRMWARE == 'true'
       uses: actions/upload-artifact@v4
       with:
-        name: OpenWrt固件-${{ github.run_number }}
+        name: lede_X86X64固件-${{ github.run_number }}
         path: ${{ env.FIRMWARE_DIR }}
-        retention-days: 3
 
-    # 1️⃣6️⃣ 上传更新日志
-    - name: 上传更新日志
-      uses: actions/upload-artifact@v4
-      with:
-        name: 更新日志-${{ github.run_number }}
-        path: ${{ env.CHANGELOG_FILE }}
-        retention-days: 0
-
-    # 1️⃣7️⃣ 发布 GitHub 版本
+    # 1️⃣6️⃣ 发布 GitHub 版本
     - name: 发布 GitHub 版本
       if: env.UPLOAD_RELEASE == 'true' && github.ref == 'refs/heads/main'
       uses: softprops/action-gh-release@v2
@@ -253,9 +235,8 @@ EOF
           ${{ env.CHANGELOG_CONTENT || '无更新日志内容' }}
         files: |
           ${{ env.FIRMWARE_DIR }}/*
-          ${{ env.CHANGELOG_FILE }}
 
-    # 1️⃣8️⃣ 清理旧版本
+    # 1️⃣7️⃣ 清理旧版本
     - name: 清理旧版本
       if: env.UPLOAD_RELEASE == 'true' && github.ref == 'refs/heads/main'
       uses: dev-drprasad/delete-older-releases@v0.3.4
