@@ -78,7 +78,7 @@ jobs:
         echo "SOURCE_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
     # 5️⃣ 配置ccache
-    - uses: hendrikmuhs/ccache-action@v1.3
+    - uses: hendrikmuhs/ccache-action@v1.2
       name: 设置编译缓存
       with:
         key: ${{ runner.os }}-lede-${{ env.SOURCE_COMMIT }}
