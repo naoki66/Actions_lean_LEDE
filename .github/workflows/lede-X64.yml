@@ -74,15 +74,17 @@ jobs:
         ln -sf /mnt/openwrt "$GITHUB_WORKSPACE/openwrt"
         cd /mnt/openwrt && echo "SOURCE_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
-    # 4️⃣ 配置 ccache
-    - name: 设置 ccache
+    # 4️⃣ 缓存 ccache
+    - name: 缓存 ccache
       uses: actions/cache@v4
       with:
         path: /mnt/openwrt/.ccache
-        key: ccache-${{ hashFiles('toolchain/**', 'include/**') }}
-        restore-keys: ccache-
+        key: ccache-${{ github.sha }}
+        restore-keys: |
+          ccache-${{ github.sha }}
+          ccache-
 
-    # 5️⃣ DL / Feeds / 工具链缓存命中
+    # 5️⃣ DL / Feeds / 工具链 缓存
     - name: 缓存 dl
       uses: actions/cache@v4
       with:
@@ -112,8 +114,10 @@ jobs:
           /mnt/openwrt/build_dir/host/*/stamp
           /mnt/openwrt/build_dir/host/.built
           /mnt/openwrt/build_dir/host/.configured_*
-        key: hosttools-${{ hashFiles('include/**') }}
-        restore-keys: hosttools-
+        key: hosttools-${{ github.sha }}
+        restore-keys: |
+          hosttools-${{ github.sha }}
+          hosttools-
 
 
     # 6️⃣ 自定义 feeds
