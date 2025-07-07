@@ -135,11 +135,11 @@ jobs:
         {
         echo "CHANGELOG_CONTENT<<EOF"
         echo "##🔧 [lede主仓库](https://github.com/coolsnowwolf/lede)"
-        curl -s "https://api.github.com/repos/coolsnowwolf/lede/commits?since=$(date -d '-3 days' --iso-8601=s)" | jq -r '.[] | "- [\(.commit.committer.date)] \(.commit.message | split("\n")[0])"'
+        curl -s "https://api.github.com/repos/coolsnowwolf/lede/commits?since=$(date -d '-7 days' --iso-8601=s)" | jq -r '.[] | "- [\(.commit.committer.date)] \(.commit.message | split("\n")[0])"'
         echo "##📦 [lede packages](https://github.com/coolsnowwolf/packages)"
-        curl -s "https://api.github.com/repos/coolsnowwolf/packages/commits?since=$(date -d '-3 days' --iso-8601=s)" | jq -r '.[] | "- [\(.commit.committer.date)] \(.commit.message | split("\n")[0])"'
+        curl -s "https://api.github.com/repos/coolsnowwolf/packages/commits?since=$(date -d '-7 days' --iso-8601=s)" | jq -r '.[] | "- [\(.commit.committer.date)] \(.commit.message | split("\n")[0])"'
         echo "##🖥️ [lede luci](https://github.com/coolsnowwolf/luci)"
-        curl -s "https://api.github.com/repos/coolsnowwolf/luci/commits?since=$(date -d '-3 days' --iso-8601=s)" | jq -r '.[] | "- [\(.commit.committer.date)] \(.commit.message | split("\n")[0])"'
+        curl -s "https://api.github.com/repos/coolsnowwolf/luci/commits?since=$(date -d '-7 days' --iso-8601=s)" | jq -r '.[] | "- [\(.commit.committer.date)] \(.commit.message | split("\n")[0])"'
         echo "EOF"
         } >> $GITHUB_ENV
 
