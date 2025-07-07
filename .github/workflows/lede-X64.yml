@@ -109,16 +109,30 @@ jobs:
     - name: 缓存 host tools
       uses: actions/cache@v4
       with:
-        path: |
-          /mnt/openwrt/build_dir/host/ccache*
-          /mnt/openwrt/build_dir/host/*/stamp
-          /mnt/openwrt/build_dir/host/.built
-          /mnt/openwrt/build_dir/host/.configured_*
+        path: /mnt/openwrt/build_dir/host*
         key: hosttools-${{ github.sha }}
         restore-keys: |
           hosttools-${{ github.sha }}
           hosttools-
 
+    - name: OpenWrt专用缓存
+      uses: klever1988/cachewrtbuild@main
+      with:
+        #是否缓存
+        ccache: 'true'
+        #是否缓存编译器
+        toolchain: 'true'
+        #是否跳过编译器重新编译
+        skip: 'true'
+        #清除缓存
+        clean: 'false'
+        #跳过保存     
+        skip_saving: 'false'
+        #标识缓存
+        mixkey: 'X86'
+        #构建目录的路径前缀
+        prefix: 'openwrt'
+        
 
     # 6️⃣ 自定义 feeds
     - name: 应用自定义 feeds和config
@@ -171,7 +185,7 @@ jobs:
         cd /mnt/openwrt
         mkdir -p logs
         echo "::notice::ccache 统计：" && ccache -s
-        if ! make -j2 V=s 2>&1 | tee logs/build.log; then
+        if ! make -j4 V=s 2>&1 | tee logs/build.log; then
           echo "::error::并行编译失败，尝试单线程"
           make -j1 V=s 2>&1 | tee -a logs/build.log || exit 1
         fi
