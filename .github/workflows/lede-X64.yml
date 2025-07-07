@@ -34,17 +34,14 @@ jobs:
       cancel-in-progress: true
 
     steps:
-    # 1️⃣ 记录开始时间
-    - name: 记录开始时间
+    # 1️⃣ 检出仓库并记录开始时间
+    - name: 检出仓库并记录开始时间
+      uses: actions/checkout@v4
       run: |
         echo "TIME0=$(date '+%Y-%m-%d %H:%M:%S')" >> "$GITHUB_ENV"
         echo "RELEASE_TAG=$(date '+%Y.%m.%d-%H%M')" >> $GITHUB_ENV
 
-    # 2️⃣ 检出仓库
-    - name: 检出仓库
-      uses: actions/checkout@v4
-
-    # 3️⃣ 准备构建环境
+    # 2️⃣ 准备构建环境
     - name: 准备构建环境
       env: { DEBIAN_FRONTEND: noninteractive }
       run: |
@@ -64,7 +61,7 @@ jobs:
         sudo apt-get -qq autoremove --purge
         sudo apt-get -qq clean
 
-    # 4️⃣ 克隆源码
+    # 3️⃣ 克隆源码
     - name: 克隆源码到 /mnt
       run: |
         sudo mkdir -p /mnt/openwrt && sudo chown $USER:$USER /mnt/openwrt
@@ -72,7 +69,7 @@ jobs:
         ln -sf /mnt/openwrt "$GITHUB_WORKSPACE/openwrt"
         cd /mnt/openwrt && echo "SOURCE_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
-    # 5️⃣ 配置 ccache
+    # 4️⃣ 配置 ccache
     - name: 设置 ccache
       uses: actions/cache@v4
       with:
@@ -80,7 +77,7 @@ jobs:
         key: ccache-${{ hashFiles('toolchain/**', 'include/**') }}
         restore-keys: ccache-
 
-    # 6️⃣ DL / Feeds / 工具链缓存命中
+    # 5️⃣ DL / Feeds / 工具链缓存命中
     - name: 缓存 dl
       uses: actions/cache@v4
       with:
@@ -114,7 +111,7 @@ jobs:
         restore-keys: hosttools-
 
 
-    # 7️⃣ 自定义 feeds
+    # 6️⃣ 自定义 feeds
     - name: 应用自定义 feeds和config
       run: |
         [ -e files ] && cp-r "$GITHUB_WORKSPACE/files" /mnt/openwrt/files   || echo "::warning::没有定义 配置文件files"
@@ -124,7 +121,7 @@ jobs:
         sed -i 's/OpenWrt/Build${{ env.RELEASE_TAG }} @ OpenWrt/g' package/lean/default-settings/files/zzz-default-settings
 
 
-    # 8️⃣ 更新和安装 feeds（始终执行，无条件）
+    # 7️⃣ 更新和安装 feeds（始终执行，无条件）
     - name: 更新和安装 feeds
       run: |
         cd /mnt/openwrt
@@ -132,12 +129,12 @@ jobs:
         ./scripts/feeds install -a -f
         [ -f "$GITHUB_WORKSPACE/$DIY_P2_SH" ] && chmod +x "$GITHUB_WORKSPACE/$DIY_P2_SH" && "$GITHUB_WORKSPACE/$DIY_P2_SH" || echo "::notice::没有定义 配置文件DIY_P2_SH"
 
-    # 9️⃣ 生成上游更新日志
+    # 8️⃣ 生成上游更新日志
     - name: 通过API生成上游更新日志
       run: |
         {
         echo "CHANGELOG_CONTENT<<EOF"
-        echo "##🔧 [lede 主仓库](https://github.com/coolsnowwolf/lede)"
+        echo "##🔧 [lede主仓库](https://github.com/coolsnowwolf/lede)"
         curl -s "https://api.github.com/repos/coolsnowwolf/lede/commits?since=$(date -d '-3 days' --iso-8601=s)" | jq -r '.[] | "- [\(.commit.committer.date)] \(.commit.message | split("\n")[0])"'
         echo "##📦 [lede packages](https://github.com/coolsnowwolf/packages)"
         curl -s "https://api.github.com/repos/coolsnowwolf/packages/commits?since=$(date -d '-3 days' --iso-8601=s)" | jq -r '.[] | "- [\(.commit.committer.date)] \(.commit.message | split("\n")[0])"'
@@ -146,7 +143,7 @@ jobs:
         echo "EOF"
         } >> $GITHUB_ENV
 
-    # 1️⃣0️⃣ 下载源码依赖
+    # 9️⃣ 下载源码依赖
     - name: 下载源码依赖
       run: |
         cd /mnt/openwrt
@@ -159,7 +156,7 @@ jobs:
         done
         find dl -size -1024c -exec rm -f {} \;
 
-    # 1️⃣1️⃣ 编译固件
+    # 🔟 编译固件
     - name: 编译固件
       run: |
         cd /mnt/openwrt
@@ -172,17 +169,18 @@ jobs:
         echo "::notice::ccache 编译后：" && ccache -s
         echo "TIME1=$(date '+%Y-%m-%d %H:%M:%S')" >> "$GITHUB_ENV"
 
-    # 1️⃣2️⃣ 上传编译日志
-    - name: 上传编译日志
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: 编译日志-${{ github.run_number }}
-        path: /mnt/openwrt/logs/build.log
-        retention-days: 3
 
-    # 1️⃣3️⃣ 记录结束时间和耗时
-    - name: 记录结束时间和耗时
+
+    # 1️⃣1️⃣ 整理固件
+    - name: 整理固件文件
+      id: organize
+      run: |
+        cd /mnt/openwrt/bin/targets/*/*
+        rm -rf packages
+        echo "FIRMWARE_DIR=$PWD" >> $GITHUB_ENV
+
+    # 1️⃣2️⃣ 计算编译耗时
+    - name: 计算编译耗时
       run: |
         # 将 TIME0 和 TIME1 转换为 Unix 时间戳（秒）
         START_TIME=$(date -u -d "${{ env.TIME0 }}" +%s)
@@ -195,15 +193,7 @@ jobs:
         echo "ELAPSED=$ELAPSED_FORMATTED" >> $GITHUB_ENV
         echo "::notice::总耗时: $ELAPSED"
 
-    # 1️⃣4️⃣ 整理固件
-    - name: 整理固件文件
-      id: organize
-      run: |
-        cd /mnt/openwrt/bin/targets/*/*
-        rm -rf packages
-        echo "FIRMWARE_DIR=$PWD" >> $GITHUB_ENV
-
-    # 1️⃣5️⃣ 上传固件
+    # 1️⃣3️⃣ 上传固件
     - name: 上传固件产物
       if: env.UPLOAD_FIRMWARE == 'true'
       uses: actions/upload-artifact@v4
@@ -211,7 +201,7 @@ jobs:
         name: lede_X86X64固件-${{ github.run_number }}
         path: ${{ env.FIRMWARE_DIR }}
 
-    # 1️⃣6️⃣ 发布 GitHub 版本
+    # 1️⃣4️⃣ 发布 GitHub 版本
     - name: 发布 GitHub 版本
       if: env.UPLOAD_RELEASE == 'true' && github.ref == 'refs/heads/main'
       uses: softprops/action-gh-release@v2
@@ -229,7 +219,7 @@ jobs:
         files: |
           ${{ env.FIRMWARE_DIR }}/*
 
-    # 1️⃣7️⃣ 清理旧版本
+    # 1️⃣5️⃣ 清理旧版本
     - name: 清理旧版本
       if: env.UPLOAD_RELEASE == 'true' && github.ref == 'refs/heads/main'
       uses: dev-drprasad/delete-older-releases@v0.3.4
