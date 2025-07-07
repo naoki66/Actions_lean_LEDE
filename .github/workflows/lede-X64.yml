@@ -1,4 +1,4 @@
-name: "构建LEDE-X86X64固件"
+name: "构建LEDE-X64固件"
 
 on:
   repository_dispatch:
@@ -35,8 +35,13 @@ jobs:
 
     steps:
     # 1️⃣ 检出仓库并记录开始时间
-    - name: 检出仓库并记录开始时间
+    - name: 检出仓库
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: 记录开始时间
       run: |
         echo "TIME0=$(date '+%Y-%m-%d %H:%M:%S')" >> "$GITHUB_ENV"
         echo "RELEASE_TAG=$(date '+%Y.%m.%d-%H%M')" >> $GITHUB_ENV
@@ -209,7 +214,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_TRIGGER_PAT }}
       with:
         tag_name: ${{ env.RELEASE_TAG }}
-        name: LEDE-X86X64-${{ env.RELEASE_TAG }}
+        name: LEDE-X64-${{ env.RELEASE_TAG }}
         body: |
           📦 **编译时间段**  
           ⏰ 从 **${{ env.TIME0 }}** 到 **${{ env.TIME1 }}**  
